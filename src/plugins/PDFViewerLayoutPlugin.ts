@@ -1,0 +1,25 @@
+'use strict';
+
+import type { Plugin } from '@react-pdf-viewer/core';
+import React from 'react';
+import { DocumentLayout, LayoutBlock } from '../types';
+
+export interface LayoutPlugin extends Plugin {}
+
+export interface LayoutPluginProps {
+    layout: DocumentLayout | null;
+    layoutInteraction: (block: LayoutBlock) => void;
+    renderLayoutBlock: (block: LayoutBlock) => React.ReactNode;
+}
+
+export function layoutPlugin (props?: LayoutPluginProps): LayoutPlugin {
+    var renderPageLayer = function (renderPageProps : any) {
+        const layoutBlocks = props?.layout?.blocks
+            .filter((block) => block.pageNumber === renderPageProps.pageIndex)
+            .map((block, _) => props.renderLayoutBlock(block));
+        return React.createElement(React.Fragment, null, layoutBlocks);
+    };
+    return {
+        renderPageLayer: renderPageLayer,
+    };
+};

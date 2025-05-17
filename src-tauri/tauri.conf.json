@@ -33,8 +33,8 @@
     "windows": [
       {
         "title": "Equix",
-        "width": 800,
-        "height": 600
+        "width": 1500,
+        "height": 1000
       }
     ],
     "security": {

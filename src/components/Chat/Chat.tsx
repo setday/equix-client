@@ -103,7 +103,7 @@ const UserMessage = styled(Card)`
   word-break: break-word;
 `;
 
-const BotMessage = styled(Card)<{ isLoading?: boolean }>`
+const BotMessage = styled(Card)`
   align-self: flex-start;
   padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   background-color: ${({ theme }) => theme.colors.background.secondary};

@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from 'styled-components';
 import { Viewer } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
-import { DocumentLayout } from "../../types";
+import { DocumentLayout, LayoutBlock } from "../../types";
 import { Upload } from 'react-feather';
 import Card from '../UI/Card';
 import Button from '../UI/Button';
+import { layoutPlugin } from "../../plugins/PDFViewerLayoutPlugin";
+import MarkupBlock from '../MarkupBlock/MarkupBlock';
+import { useNotification } from "../../contexts/NotificationContext";
 
 interface PDFViewerProps {
   file: File | null;
@@ -97,74 +100,7 @@ const LoadingText = styled.p`
   margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
-const MarkupOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 5;
-`;
 
-const MarkupBlock = styled.div<{ blockType: string }>`
-  position: absolute;
-  border-radius: ${({ theme }) => theme.borderRadius.xs};
-  border: 1.5px solid;
-  opacity: 0.6;
-  pointer-events: all;
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.2s;
-  
-  ${({ blockType, theme }) => {
-    switch (blockType) {
-      case 'text':
-        return `
-          border-color: ${theme.colors.info};
-          background-color: rgba(24, 144, 255, 0.1);
-        `;
-      case 'table':
-        return `
-          border-color: ${theme.colors.secondary.main};
-          background-color: rgba(247, 37, 133, 0.1);
-        `;
-      case 'figure':
-        return `
-          border-color: ${theme.colors.success};
-          background-color: rgba(82, 196, 26, 0.1);
-        `;
-      case 'title':
-        return `
-          border-color: ${theme.colors.warning};
-          background-color: rgba(250, 173, 20, 0.1);
-        `;
-      default:
-        return `
-          border-color: ${theme.colors.neutral[500]};
-          background-color: rgba(144, 144, 144, 0.1);
-        `;
-    }
-  }}
-  
-  &:hover {
-    opacity: 0.8;
-    transform: scale(1.005);
-  }
-`;
-
-const InfoFooter = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
-  background-color: ${({ theme }) => theme.colors.background.secondary};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.fontSizes.sm};
-  z-index: 6;
-`;
 
 /**
  * Component for rendering PDF with layout overlays
@@ -175,22 +111,46 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   isLoading = false,
   onCancel
 }): JSX.Element => {
-  const [numPages, setNumPages] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const { showNotification, showSuccess } = useNotification();
   
-  // Get blocks for the current page
-  const currentPageBlocks = documentLayout?.blocks.filter(
-    block => block.pageNumber === currentPage
-  ) || [];
-
-  const handleDocumentLoad = ({ numPages }: { numPages: number }): void => {
-    setNumPages(numPages);
+  // Handle context menu actions from MarkupBlock
+  const handleContextAction = (action: string, blockType: string, block: LayoutBlock) => {
+    console.log(`Action ${action} on ${blockType} block`, block);
+    
+    switch (action) {
+      case 'copy':
+        if (block.content) {
+          navigator.clipboard.writeText(block.content)
+            .then(() => {
+              showSuccess('Content copied to clipboard');
+            })
+            .catch((err) => {
+              console.error('Failed to copy content:', err);
+              showNotification('error', 'Failed to copy content');
+            });
+        }
+        break;
+      case 'extract':
+        showNotification('info', `Extracting ${blockType} content...`);
+        // Additional logic to extract table would go here
+        break;
+      case 'search':
+        showNotification('info', `Searching in ${blockType} content...`);
+        // Additional logic for search would go here
+        break;
+      case 'save':
+        showNotification('info', `Saving ${blockType} content...`);
+        // Additional logic for saving would go here
+        break;
+      case 'annotate':
+      case 'bookmark':
+        showNotification('info', `Adding annotation to ${blockType}...`);
+        // Additional logic for annotation would go here
+        break;
+      default:
+        showNotification('info', `${action} action triggered on ${blockType} block`);
+    }
   };
-
-  const handlePageChange = (page: number): void => {
-    setCurrentPage(page);
-  };
-
   if (!file) {
     return (
       <PDFContainer>
@@ -204,14 +164,73 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
       </PDFContainer>
     );
   }
+  const layoutPluginInstance = layoutPlugin({
+    layout: {
+      blocks: documentLayout?.blocks || [
+        {
+          id: '1',
+          type: 'text',
+          pageNumber: 0,
+          boundingBox: { x: 0.5, y: 0.5, width: 0.25, height: 0.25 },
+          content: 'Sample text block content',
+          confidence: 0.95,
+        },
+        {
+          id: '2',
+          type: 'table',
+          pageNumber: 0,
+          boundingBox: { x: 0.1, y: 0.1, width: 0.4, height: 0.3 },
+          content: 'Sample table block content',
+          confidence: 0.85,
+        },
+        {
+          id: '3',
+          type: 'figure',
+          pageNumber: 0,
+          boundingBox: { x: 0.6, y: 0.6, width: 0.3, height: 0.2 },
+          content: 'Sample figure block content',
+          confidence: 0.9,
+        },
+        {
+          id: '4',
+          type: 'title',
+          pageNumber: 0,
+          boundingBox: { x: 0.2, y: 0.2, width: 0.5, height: 0.1 },
+          content: 'Sample title block content',
+          confidence: 0.8,
+        },        {
+          id: '5',
+          type: 'other',
+          pageNumber: 0,
+          boundingBox: { x: 0.3, y: 0.3, width: 0.2, height: 0.2 },
+          content: 'Sample unknown block content',
+          confidence: 0.7,
+        }
+      ],
+      pageCount: documentLayout?.pageCount || 1,
+    },
+    layoutInteraction: (block) => {
+      // Handle block interaction if needed
+      console.log('Block clicked:', block);
+    },    renderLayoutBlock: (block) => {
+      console.log('Rendering block:', block);
+      return (
+        <MarkupBlock 
+          key={block.id} 
+          blockType={block.type} 
+          boundingBox={block.boundingBox} 
+          onContextAction={(action, blockType) => handleContextAction(action, blockType, block)}
+        />
+      );
+    },
+  });
 
   return (
     <PDFContainer>
       <ViewerWrapper>
-        <Viewer 
-        fileUrl={URL.createObjectURL(file)}
-        // onDocumentLoad={handleDocumentLoad}
-        // onPageChange={handlePageChange}
+        <Viewer
+          fileUrl={URL.createObjectURL(file)}
+          plugins={[layoutPluginInstance]}
         />
           
         {isLoading && (
@@ -227,32 +246,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
               </Button>
             )}
           </LoadingOverlay>
-        )}
-        
-        {documentLayout && !isLoading && (
-          <MarkupOverlay>
-            {currentPageBlocks.map((block) => (
-              <MarkupBlock 
-                key={block.id} 
-                blockType={block.type}
-                style={{ 
-                  top: `${block.boundingBox.y}px`,
-                  left: `${block.boundingBox.x}px`,
-                  width: `${block.boundingBox.width}px`,
-                  height: `${block.boundingBox.height}px`,
-                  ...(block.style || {})
-                }}
-                title={`${block.type}: ${block.content.substring(0, 50)}${block.content.length > 50 ? '...' : ''}`}
-              />
-            ))}
-          </MarkupOverlay>
-        )}
-        
-        {documentLayout && !isLoading && (
-          <InfoFooter>
-            <span>Page {currentPage} of {numPages}</span>
-            <span>{currentPageBlocks.length} detected elements on this page</span>
-          </InfoFooter>
         )}
       </ViewerWrapper>
     </PDFContainer>

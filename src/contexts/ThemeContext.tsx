@@ -84,7 +84,7 @@ export const ThemeContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
   return (
     <ThemeContext.Provider value={{ themeMode, toggleTheme, isDarkMode }}>
       <StyledThemeProvider theme={currentTheme}>
-        <GlobalStyles />
+        <GlobalStyles theme={currentTheme} />
         {children}
       </StyledThemeProvider>
     </ThemeContext.Provider>

@@ -12,10 +12,10 @@ export const documentService = {
    */
   extractLayout: async (file: File): Promise<LayoutResponse> => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('document', file);
 
     const response = await apiClient.post<LayoutResponse>(
-      '/extract-layout', 
+      '/layout-extraction',
       formData, 
       {
         headers: {
@@ -23,6 +23,8 @@ export const documentService = {
         },
       }
     );
+
+    console.log('Layout extraction response:', response.data);
 
     return response.data;
   },
@@ -40,7 +42,7 @@ export const documentService = {
     format: 'Markdown' | 'HTML' | 'Plain' = 'Markdown'
   ): Promise<GraphicsExtractionResponse> => {
     const response = await apiClient.get<GraphicsExtractionResponse>(
-      `/documents/${documentId}/blocks/${blockId}/graphics`,
+      `/graphics-extraction/${documentId}/blocks/${blockId}/graphics`,
       {
         params: { format }
       }

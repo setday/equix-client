@@ -8,6 +8,7 @@ interface CardProps {
   fullWidth?: boolean;
   className?: string;
   children: React.ReactNode;
+  isLoading?: boolean;
 }
 
 const StyledCard = styled.div<CardProps>`
@@ -60,6 +61,7 @@ const Card: React.FC<CardProps> = ({
   margin,
   fullWidth = false,
   className,
+  isLoading = false,
 }) => {
   return (
     <StyledCard 
@@ -68,6 +70,7 @@ const Card: React.FC<CardProps> = ({
       margin={margin}
       fullWidth={fullWidth}
       className={className}
+      isLoading={isLoading}
     >
       {children}
     </StyledCard>

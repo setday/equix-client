@@ -33,17 +33,17 @@ const LeftPanel = styled.div`
   margin-right: 0;
 `;
 
-const RightPanel = styled.div<{ isVisible: boolean }>`
-  width: ${({ isVisible }) => (isVisible ? '380px' : '0')};
+const RightPanel = styled.div<{ $isVisible: boolean }>`
+  width: ${({ $isVisible }) => ($isVisible ? '380px' : '0')};
   transition: width ${({ theme }) => theme.transitions.default};
   overflow: hidden;
   margin-top: ${({ theme }) => theme.spacing.md};
   margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
-const ToggleChatButton = styled.button<{ isVisible: boolean }>`
+const ToggleChatButton = styled.button<{ $isVisible: boolean }>`
   position: absolute;
-  right: ${({ isVisible }) => (isVisible ? '380px' : '0px')};
+  right: ${({ $isVisible }) => ($isVisible ? '380px' : '0px')};
   top: 50%;
   transform: translateY(-50%);
   width: 32px;
@@ -67,13 +67,13 @@ const ToggleChatButton = styled.button<{ isVisible: boolean }>`
   }
 `;
 
-const DropZone = styled.div<{ isDragActive: boolean }>`
+const DropZone = styled.div<{ $isDragActive: boolean }>`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  display: ${({ isDragActive }) => (isDragActive ? 'flex' : 'none')};
+  display: ${({ $isDragActive }) => ($isDragActive ? 'flex' : 'none')};
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -201,7 +201,7 @@ const MainLayout: React.FC = (): JSX.Element => {
         
         <ToggleChatButton 
           onClick={toggleChat}
-          isVisible={chatVisible}
+          $isVisible={chatVisible}
           aria-label={chatVisible ? "Hide chat" : "Show chat"}
           title={chatVisible ? "Hide chat" : "Show chat"}
         >
@@ -209,11 +209,11 @@ const MainLayout: React.FC = (): JSX.Element => {
           {chatVisible ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </ToggleChatButton>
         
-        <RightPanel isVisible={chatVisible}>
+        <RightPanel $isVisible={chatVisible}>
           <ChatContainer />
         </RightPanel>
         
-        <DropZone isDragActive={isDragActive}>
+        <DropZone $isDragActive={isDragActive}>
           <UploadCloud size={64} />
           <h2>Drop PDF File to Analyze</h2>
           <p>Release your file here to begin analysis</p>
