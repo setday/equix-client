@@ -1,66 +1,27 @@
-import { useState } from 'react';
-import { useNotification } from '../contexts/NotificationContext';
-import { getErrorMessage } from '../utils/apiErrorHandler';
 import { documentService } from '../api';
 import { LayoutResponse, GraphicsExtractionResponse } from '../types';
-
-interface ApiStateLoading {
-  [key: string]: boolean;
-}
-
-interface ApiStateErrors {
-  [key: string]: string | null;
-}
-
-interface ApiState {
-  loading: ApiStateLoading;
-  errors: ApiStateErrors;
-}
+import { useApiWithNotification } from './useApiWithNotification';
 
 /**
- * Hook for handling API calls with integrated notification system
+ * Hook for handling specific API calls using a generic notification-aware API caller.
  */
 export function useApi() {
-  const [state, setState] = useState<ApiState>({
-    loading: {},
-    errors: {}
+  const { callApi, loading, error } = useApiWithNotification({
+    showSuccessNotification: true,
+    showErrorNotification: true,
   });
-  const { showError, showSuccess } = useNotification();
-
-  const setLoading = (key: string, isLoading: boolean): void => {
-    setState(prev => ({
-      ...prev,
-      loading: { ...prev.loading, [key]: isLoading }
-    }));
-  };
-
-  const setError = (key: string, error: string | null): void => {
-    setState(prev => ({
-      ...prev,
-      errors: { ...prev.errors, [key]: error }
-    }));
-  };
 
   /**
    * Extract layout from a PDF file with notification handling
    */
   const extractLayout = async (file: File): Promise<LayoutResponse | null> => {
-    const operationKey = 'extractLayout';
-    setLoading(operationKey, true);
-    setError(operationKey, null);
-    
-    try {
-      const response = await documentService.extractLayout(file);
-      showSuccess('PDF layout extracted successfully');
-      return response;
-    } catch (error) {
-      const errorMessage = getErrorMessage(error);
-      setError(operationKey, errorMessage);
-      showError(`Failed to extract layout: ${errorMessage}`);
-      return null;
-    } finally {
-      setLoading(operationKey, false);
-    }
+    return callApi(
+      documentService.extractLayout(file),
+      {
+        successMessage: 'PDF layout extracted successfully',
+        errorMessage: (err) => `Failed to extract layout: ${err.message || 'Unknown error'}`
+      }
+    );
   };
 
   /**
@@ -71,22 +32,13 @@ export function useApi() {
     blockId: number,
     format: 'Markdown' | 'HTML' | 'Plain' = 'Markdown'
   ): Promise<GraphicsExtractionResponse | null> => {
-    const operationKey = 'extractGraphics';
-    setLoading(operationKey, true);
-    setError(operationKey, null);
-
-    try {
-      const response = await documentService.extractGraphics(documentId, blockId, format);
-      showSuccess('Graphics extracted successfully');
-      return response;
-    } catch (error) {
-      const errorMessage = getErrorMessage(error);
-      setError(operationKey, errorMessage);
-      showError(`Failed to extract graphics: ${errorMessage}`);
-      return null;
-    } finally {
-      setLoading(operationKey, false);
-    }
+    return callApi(
+      documentService.extractGraphics(documentId, blockId, format),
+      {
+        successMessage: 'Graphics extracted successfully',
+        errorMessage: (err) => `Failed to extract graphics: ${err.message || 'Unknown error'}`
+      }
+    );
   };
 
   /**
@@ -95,27 +47,19 @@ export function useApi() {
   const askQuestion = async (
     documentId: string,
     question: string
-  ): Promise<string | null> => {
-    const operationKey = 'askQuestion';
-    setLoading(operationKey, true);
-    setError(operationKey, null);
-
-    try {
-      const response = await documentService.askQuestion(documentId, question);
-      return response.answer;
-    } catch (error) {
-      const errorMessage = getErrorMessage(error);
-      setError(operationKey, errorMessage);
-      showError(`Failed to process question: ${errorMessage}`);
-      return null;
-    } finally {
-      setLoading(operationKey, false);
-    }
+  ): Promise<{ answer: string } | null> => {
+    return callApi<{ answer: string }>(
+      documentService.askQuestion(documentId, question),
+      {
+        successMessage: 'Question processed successfully',
+        errorMessage: (err) => `Failed to process question: ${err.message || 'Unknown error'}`
+      }
+    );
   };
 
   return {
-    loading: state.loading,
-    errors: state.errors,
+    loading,
+    error,
     extractLayout,
     extractGraphics,
     askQuestion

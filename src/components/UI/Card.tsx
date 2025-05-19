@@ -2,13 +2,13 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 interface CardProps {
-  elevation?: 0 | 1 | 2 | 3;
-  padding?: boolean | string;
-  margin?: string;
-  fullWidth?: boolean;
-  className?: string;
+  $elevation?: 0 | 1 | 2 | 3;
+  $padding?: boolean | string;
+  $margin?: string;
+  $fullWidth?: boolean;
+  $className?: string;
   children: React.ReactNode;
-  isLoading?: boolean;
+  $isLoading?: boolean;
 }
 
 const StyledCard = styled.div<CardProps>`
@@ -16,22 +16,22 @@ const StyledCard = styled.div<CardProps>`
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   overflow: hidden;
   
-  ${({ fullWidth }) => fullWidth && css`
+  ${({ $fullWidth }) => $fullWidth && css`
     width: 100%;
   `}
   
-  ${({ padding, theme }) => {
-    if (padding === false) return css`padding: 0;`;
-    if (typeof padding === 'string') return css`padding: ${padding};`;
+  ${({ $padding, theme }) => {
+    if ($padding === false) return css`padding: 0;`;
+    if (typeof $padding === 'string') return css`padding: ${$padding};`;
     return css`padding: ${theme.spacing.md};`;
   }}
   
-  ${({ margin }) => margin && css`
-    margin: ${margin};
+  ${({ $margin }) => $margin && css`
+    margin: ${$margin};
   `}
   
-  ${({ elevation, theme }) => {
-    switch (elevation) {
+  ${({ $elevation, theme }) => {
+    switch ($elevation) {
       case 0:
         return css`
           box-shadow: none;
@@ -56,21 +56,21 @@ const StyledCard = styled.div<CardProps>`
 
 const Card: React.FC<CardProps> = ({ 
   children, 
-  elevation = 1, 
-  padding = true, 
-  margin,
-  fullWidth = false,
-  className,
-  isLoading = false,
+  $elevation = 1, 
+  $padding = true, 
+  $margin,
+  $fullWidth = false,
+  $className,
+  $isLoading = false,
 }) => {
   return (
     <StyledCard 
-      elevation={elevation}
-      padding={padding}
-      margin={margin}
-      fullWidth={fullWidth}
-      className={className}
-      isLoading={isLoading}
+      $elevation={$elevation}
+      $padding={$padding}
+      $margin={$margin}
+      $fullWidth={$fullWidth}
+      $className={$className}
+      $isLoading={$isLoading}
     >
       {children}
     </StyledCard>

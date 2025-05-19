@@ -114,7 +114,7 @@ const BotMessage = styled(Card)`
   max-width: 85%;
   word-break: break-word;
   
-  ${({ isLoading }) => isLoading && `
+  ${({ $isLoading }) => $isLoading && `
     &::after {
       content: "●●●";
       display: inline-block;
@@ -187,7 +187,7 @@ const Chat: React.FC<ChatProps> = ({ pdfFile, fileName, onClearMessages }): JSX.
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const queryRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { askQuestion, loading } = useApi();
+  const { loading, askQuestion } = useApi();
   
   const clearMessages = useCallback(() => {
     setMessages([]);
@@ -195,16 +195,14 @@ const Chat: React.FC<ChatProps> = ({ pdfFile, fileName, onClearMessages }): JSX.
 
   useEffect(() => {
     if (onClearMessages) {
-      onClearMessages(clearMessages); // Pass the clearMessages function to the parent
+      onClearMessages(clearMessages);
     }
   }, [onClearMessages, clearMessages]);
 
-  // Scroll to bottom when messages change
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
   
-  // Scroll to bottom when new messages are added
   React.useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
@@ -217,7 +215,6 @@ const Chat: React.FC<ChatProps> = ({ pdfFile, fileName, onClearMessages }): JSX.
     const input = queryRef.current.value.trim();
     const messageId = uuidv4();
     
-    // Add user message with loading state
     setMessages(prev => [...prev, { 
       id: messageId, 
       text: input, 
@@ -226,25 +223,21 @@ const Chat: React.FC<ChatProps> = ({ pdfFile, fileName, onClearMessages }): JSX.
       isLoading: true
     }]);
     
-    // Clear input field
     queryRef.current.value = "";
     adjustHeight();
     
     try {
-      // Call API to get response
       const documentId = fileName;
       const answer = await askQuestion(documentId, input);
       
-      // Update message with response
       setMessages(prev => 
         prev.map(msg => 
           msg.id === messageId 
-            ? { ...msg, response: answer || 'No response received', isLoading: false } 
+            ? { ...msg, response: answer?.answer || 'No response received', isLoading: false } 
             : msg
         )
       );
     } catch (error) {
-      // Handle error
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       
       setMessages(prev => 
@@ -278,9 +271,8 @@ const Chat: React.FC<ChatProps> = ({ pdfFile, fileName, onClearMessages }): JSX.
     }
   }
 
-  const isQueryDisabled = !pdfFile || loading.askQuestion;
+  const isQueryDisabled = pdfFile === null || loading || askQuestion === null;
   
-  // Simplified file name for display
   const displayFileName = fileName 
     ? fileName.split('\\').pop()?.split('/').pop() 
     : 'PDF Document';
@@ -306,7 +298,7 @@ const Chat: React.FC<ChatProps> = ({ pdfFile, fileName, onClearMessages }): JSX.
           messages.map((msg) => (
             <MessageItem key={msg.id} isError={!!msg.error}>
               <UserMessage>{msg.text}</UserMessage>
-              <BotMessage isLoading={msg.isLoading}>
+              <BotMessage $isLoading={msg.isLoading}>
                 {msg.isLoading ? '' : msg.response}
               </BotMessage>
             </MessageItem>
@@ -320,7 +312,7 @@ const Chat: React.FC<ChatProps> = ({ pdfFile, fileName, onClearMessages }): JSX.
           <ChatTextarea
             ref={queryRef}
             onChange={handleKeyDown}
-            onKeyPress={handleKeyPress}
+            onKeyDown ={handleKeyPress}
             placeholder={isQueryDisabled 
               ? "Please upload a PDF file first" 
               : "Ask a question about the document..."}
@@ -330,8 +322,8 @@ const Chat: React.FC<ChatProps> = ({ pdfFile, fileName, onClearMessages }): JSX.
           <IconButton
             onClick={sendMessage}
             disabled={isQueryDisabled}
-            variant="primary"
-            size="small"
+            $variant="primary"
+            $size="small"
             title="Send message"
           >
             <Send size={18} />

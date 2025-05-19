@@ -5,9 +5,9 @@ type IconButtonVariant = 'primary' | 'secondary' | 'outlined' | 'text';
 type IconButtonSize = 'small' | 'medium' | 'large';
 
 interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: IconButtonVariant;
-  size?: IconButtonSize;
-  isLoading?: boolean;
+  $variant?: IconButtonVariant;
+  $size?: IconButtonSize;
+  $isLoading?: boolean;
 }
 
 const StyledIconButton = styled.button<IconButtonProps>`
@@ -27,8 +27,8 @@ const StyledIconButton = styled.button<IconButtonProps>`
   `}
   
   /* Size styles */
-  ${({ size, theme }) => {
-    switch (size) {
+  ${({ $size, theme }) => {
+    switch ($size) {
       case 'small':
         return css`
           width: 32px;
@@ -51,8 +51,8 @@ const StyledIconButton = styled.button<IconButtonProps>`
   }}
   
   /* Variant styles */
-  ${({ variant, theme }) => {
-    switch (variant) {
+  ${({ $variant, theme }) => {
+    switch ($variant) {
       case 'secondary':
         return css`
           background-color: ${theme.colors.secondary.main};
@@ -102,7 +102,7 @@ const StyledIconButton = styled.button<IconButtonProps>`
   }}
   
   /* Loading spinner */
-  ${({ isLoading }) => isLoading && css`
+  ${({ $isLoading }) => $isLoading && css`
     .icon-content {
       visibility: hidden;
     }
@@ -130,16 +130,16 @@ const StyledIconButton = styled.button<IconButtonProps>`
 
 export const IconButton: React.FC<IconButtonProps> = ({
   children,
-  variant = 'text',
-  size = 'medium',
-  isLoading = false,
+  $variant = 'text',
+  $size = 'medium',
+  $isLoading = false,
   ...props
 }) => {
   return (
     <StyledIconButton
-      variant={variant}
-      size={size}
-      isLoading={isLoading}
+      $variant={$variant}
+      $size={$size}
+      $isLoading={$isLoading}
       {...props}
     >
       <span className="icon-content">{children}</span>

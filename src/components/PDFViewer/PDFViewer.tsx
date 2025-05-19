@@ -119,8 +119,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     
     switch (action) {
       case 'copy':
-        if (block.content) {
-          navigator.clipboard.writeText(block.content)
+        if (block.text_content) {
+          navigator.clipboard.writeText(block.text_content)
             .then(() => {
               showSuccess('Content copied to clipboard');
             })
@@ -154,7 +154,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   if (!file) {
     return (
       <PDFContainer>
-        <PlaceholderContainer elevation={0}>
+        <PlaceholderContainer $elevation={0}>
           <Upload size={64} />
           <h3>No PDF Document Loaded</h3>
           <p>
@@ -165,72 +165,30 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     );
   }
   const layoutPluginInstance = layoutPlugin({
-    layout: {
-      blocks: documentLayout?.blocks || [
-        {
-          id: '1',
-          type: 'text',
-          pageNumber: 0,
-          boundingBox: { x: 0.5, y: 0.5, width: 0.25, height: 0.25 },
-          content: 'Sample text block content',
-          confidence: 0.95,
-        },
-        {
-          id: '2',
-          type: 'table',
-          pageNumber: 0,
-          boundingBox: { x: 0.1, y: 0.1, width: 0.4, height: 0.3 },
-          content: 'Sample table block content',
-          confidence: 0.85,
-        },
-        {
-          id: '3',
-          type: 'figure',
-          pageNumber: 0,
-          boundingBox: { x: 0.6, y: 0.6, width: 0.3, height: 0.2 },
-          content: 'Sample figure block content',
-          confidence: 0.9,
-        },
-        {
-          id: '4',
-          type: 'title',
-          pageNumber: 0,
-          boundingBox: { x: 0.2, y: 0.2, width: 0.5, height: 0.1 },
-          content: 'Sample title block content',
-          confidence: 0.8,
-        },        {
-          id: '5',
-          type: 'other',
-          pageNumber: 0,
-          boundingBox: { x: 0.3, y: 0.3, width: 0.2, height: 0.2 },
-          content: 'Sample unknown block content',
-          confidence: 0.7,
-        }
-      ],
-      pageCount: documentLayout?.pageCount || 1,
-    },
+    layout: documentLayout,
     layoutInteraction: (block) => {
       // Handle block interaction if needed
       console.log('Block clicked:', block);
-    },    renderLayoutBlock: (block) => {
-      console.log('Rendering block:', block);
+    },
+    renderLayoutBlock: (block) => {
       return (
         <MarkupBlock 
           key={block.id} 
-          blockType={block.type} 
-          boundingBox={block.boundingBox} 
+          $blockType={block.block_type} 
+          $boundingBox={block.bounding_box} 
           onContextAction={(action, blockType) => handleContextAction(action, blockType, block)}
         />
       );
     },
   });
 
+
   return (
     <PDFContainer>
       <ViewerWrapper>
         <Viewer
           fileUrl={URL.createObjectURL(file)}
-          plugins={[layoutPluginInstance]}
+          // plugins={[layoutPluginInstance]}
         />
           
         {isLoading && (
@@ -239,7 +197,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
             <LoadingText>Analyzing document structure...</LoadingText>
             {onCancel && (
               <Button 
-                variant="outlined"
+                $variant="outlined"
                 onClick={onCancel}
               >
                 Cancel Analysis

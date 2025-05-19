@@ -24,9 +24,9 @@ const TooltipWrapper = styled.div`
 `;
 
 const TooltipContent = styled.div<{
-  position: 'top' | 'right' | 'bottom' | 'left';
-  visible: boolean;
-  maxWidth: string;
+  $position: 'top' | 'right' | 'bottom' | 'left';
+  $visible: boolean;
+  $maxWidth: string;
 }>`
   position: absolute;
   background-color: ${({ theme }) => theme.colors.background.secondary};
@@ -34,16 +34,16 @@ const TooltipContent = styled.div<{
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
   border-radius: ${({ theme }) => theme.borderRadius.sm};
   font-size: ${({ theme }) => theme.typography.fontSizes.sm};
-  max-width: ${({ maxWidth }) => maxWidth};
+  max-width: ${({ $maxWidth }) => $maxWidth};
   z-index: ${({ theme }) => theme.zIndex.tooltip};
   box-shadow: ${({ theme }) => theme.shadows.md};
   pointer-events: none;
   white-space: nowrap;
   animation: ${fadeIn} 0.2s ease-in-out;
-  display: ${({ visible }) => (visible ? 'block' : 'none')};
+  display: ${({ $visible }) => ($visible ? 'block' : 'none')};
   
-  ${({ position }) => {
-    switch (position) {
+  ${({ $position }) => {
+    switch ($position) {
       case 'right':
         return `
           left: 100%;
@@ -81,8 +81,8 @@ const TooltipContent = styled.div<{
     position: absolute;
     border-style: solid;
     
-    ${({ position }) => {
-      switch (position) {
+    ${({ $position }) => {
+      switch ($position) {
         case 'right':
           return `
             left: -4px;
@@ -153,9 +153,9 @@ const Tooltip: React.FC<TooltipProps> = ({
     >
       {children}
       <TooltipContent 
-        position={position} 
-        visible={visible} 
-        maxWidth={maxWidth}
+        $position={position} 
+        $visible={visible} 
+        $maxWidth={maxWidth}
       >
         {content}
       </TooltipContent>

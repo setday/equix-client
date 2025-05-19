@@ -55,28 +55,28 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onUploadClick }) => {
         <IconButton 
           title="Upload PDF" 
           onClick={onUploadClick}
-          variant="text"
+          $variant="text"
         >
           <Upload size={20} />
         </IconButton>
         
         <IconButton 
           title="Information" 
-          variant="text"
+          $variant="text"
         >
           <Info size={20} />
         </IconButton>
         
         <IconButton 
           title="Settings" 
-          variant="text"
+          $variant="text"
         >
           <Settings size={20} />
         </IconButton>
         
         <IconButton 
           title="Help" 
-          variant="text"
+          $variant="text"
         >
           <HelpCircle size={20} />
         </IconButton>

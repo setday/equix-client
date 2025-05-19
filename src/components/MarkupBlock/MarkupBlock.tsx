@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { BoundingBox } from '../../types';
+import { BoundingBox, LayoutBlockType } from '../../types';
 import { MoreHorizontal, Copy, Download, Edit, Search, Table, Image, FileText, Code } from 'react-feather';
 import IconButton from '../UI/IconButton';
 import Tooltip from '../UI/Tooltip';
 
 interface MarkupBlockProps {
-  blockType: string;
-  boundingBox: BoundingBox;
+  $blockType: LayoutBlockType;
+  $boundingBox: BoundingBox;
   onContextAction?: (action: string, blockType: string) => void;
 }
 
@@ -17,7 +17,7 @@ interface ContextAction {
   label: string;
 }
 
-const StyledMarkupBlock = styled.div<{ blockType: string; boundingBox: BoundingBox }>`
+const StyledMarkupBlock = styled.div<{ $blockType: LayoutBlockType; $boundingBox: BoundingBox }>`
   position: absolute;
   border-radius: ${({ theme }) => theme.borderRadius.md};
   border: 2px dashed;
@@ -25,29 +25,29 @@ const StyledMarkupBlock = styled.div<{ blockType: string; boundingBox: BoundingB
   pointer-events: all;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.2s;
-  top: ${({ boundingBox }) => boundingBox.y * 100}%;
-  left: ${({ boundingBox }) => boundingBox.x * 100}%;
-  width: ${({ boundingBox }) => boundingBox.width * 100}%;
-  height: ${({ boundingBox }) => boundingBox.height * 100}%;
+  top: ${({ $boundingBox }) => $boundingBox.y * 100}%;
+  left: ${({ $boundingBox }) => $boundingBox.x * 100}%;
+  width: ${({ $boundingBox }) => $boundingBox.width * 100}%;
+  height: ${({ $boundingBox }) => $boundingBox.height * 100}%;
   
-  ${({ blockType }) => {
-    switch (blockType) {
-      case 'text':
+  ${({ $blockType }) => {
+    switch ($blockType) {
+      case LayoutBlockType.TEXT:
         return `
           border-color: rgba(24, 144, 255, 0.5);
           background-color: rgba(24, 144, 255, 0.05);
         `;
-      case 'table':
+      case LayoutBlockType.TABLE:
         return `
           border-color: rgba(247, 37, 133, 0.5);
           background-color: rgba(247, 37, 133, 0.05);
         `;
-      case 'figure':
+      case LayoutBlockType.PICTURE:
         return `
           border-color: rgba(82, 196, 26, 0.5);
           background-color: rgba(82, 196, 26, 0.05);
         `;
-      case 'title':
+      case LayoutBlockType.CAPTION:
         return `
           border-color: rgba(250, 173, 20, 0.5);
           background-color: rgba(250, 173, 20, 0.05);
@@ -79,11 +79,11 @@ const ContextButtonContainer = styled.div`
   }
 `;
 
-const ContextActionsContainer = styled.div<{ isVisible: boolean }>`
+const ContextActionsContainer = styled.div<{ $isVisible: boolean }>`
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  display: ${({ isVisible }) => (isVisible ? 'flex' : 'none')};
+  display: ${({ $isVisible }) => ($isVisible ? 'flex' : 'none')};
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.xs};
   background-color: ${({ theme }) => theme.colors.background.secondary};
@@ -135,7 +135,7 @@ const ContextButton = styled(IconButton)`
   }
 `;
 
-const MarkupBlock: React.FC<MarkupBlockProps> = ({ blockType, boundingBox, onContextAction }) => {
+const MarkupBlock: React.FC<MarkupBlockProps> = ({ $blockType, $boundingBox, onContextAction }) => {
   const [showContextMenu, setShowContextMenu] = useState(false);
   
   // Define context actions based on block type
@@ -144,26 +144,26 @@ const MarkupBlock: React.FC<MarkupBlockProps> = ({ blockType, boundingBox, onCon
       { id: 'copy', icon: <Copy size={16} />, label: 'Copy content' },
     ];
     
-    switch (blockType) {
-      case 'text':
+    switch ($blockType) {
+      case LayoutBlockType.TEXT:
         return [
           ...commonActions,
           { id: 'search', icon: <Search size={16} />, label: 'Search in text' },
           { id: 'annotate', icon: <Edit size={16} />, label: 'Add annotation' }
         ];
-      case 'table':
+      case LayoutBlockType.TABLE:
         return [
           ...commonActions,
           { id: 'extract', icon: <Table size={16} />, label: 'Extract table' },
           { id: 'download', icon: <Download size={16} />, label: 'Download as CSV' }
         ];
-      case 'figure':
+      case LayoutBlockType.PICTURE:
         return [
           ...commonActions,
           { id: 'save', icon: <Image size={16} />, label: 'Save image' },
           { id: 'analyze', icon: <Search size={16} />, label: 'Analyze image' }
         ];
-      case 'title':
+      case LayoutBlockType.CAPTION:
         return [
           ...commonActions,
           { id: 'bookmark', icon: <FileText size={16} />, label: 'Add bookmark' },
@@ -183,7 +183,7 @@ const MarkupBlock: React.FC<MarkupBlockProps> = ({ blockType, boundingBox, onCon
 
   const handleActionClick = (actionId: string) => {
     if (onContextAction) {
-      onContextAction(actionId, blockType);
+      onContextAction(actionId, $blockType);
     }
     setShowContextMenu(false);
   };
@@ -205,11 +205,11 @@ const MarkupBlock: React.FC<MarkupBlockProps> = ({ blockType, boundingBox, onCon
   }, [showContextMenu]);
 
   return (
-    <StyledMarkupBlock blockType={blockType} boundingBox={boundingBox}>
+    <StyledMarkupBlock $blockType={$blockType} $boundingBox={$boundingBox}>
       <ContextButtonContainer>
-        <Tooltip content={`${blockType.charAt(0).toUpperCase() + blockType.slice(1)} block options`}>
+        <Tooltip content={`${$blockType.charAt(0).toUpperCase() + $blockType.slice(1)} block options`}>
           <ContextButton 
-            variant="text" 
+            $variant="text" 
             onClick={handleContextButtonClick}
             aria-label="Context menu"
           >
@@ -217,7 +217,7 @@ const MarkupBlock: React.FC<MarkupBlockProps> = ({ blockType, boundingBox, onCon
           </ContextButton>
         </Tooltip>
         
-        <ContextActionsContainer isVisible={showContextMenu}>
+        <ContextActionsContainer $isVisible={showContextMenu}>
           {getContextActions().map(action => (
             <ContextActionButton
               key={action.id}

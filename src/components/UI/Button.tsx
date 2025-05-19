@@ -4,13 +4,13 @@ import styled, { css } from 'styled-components';
 type ButtonVariant = 'primary' | 'secondary' | 'outlined' | 'text';
 type ButtonSize = 'small' | 'medium' | 'large';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  fullWidth?: boolean;
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  $variant?: ButtonVariant;
+  $size?: ButtonSize;
+  $fullWidth?: boolean;
   icon?: React.ReactNode;
-  iconPosition?: 'left' | 'right';
-  isLoading?: boolean;
+  $iconPosition?: 'left' | 'right';
+  $isLoading?: boolean;
 }
 
 const StyledButton = styled.button<ButtonProps>`
@@ -27,7 +27,7 @@ const StyledButton = styled.button<ButtonProps>`
   cursor: pointer;
   white-space: nowrap;
   
-  ${({ fullWidth }) => fullWidth && css`
+  ${({ $fullWidth }) => $fullWidth && css`
     width: 100%;
   `}
   
@@ -37,8 +37,8 @@ const StyledButton = styled.button<ButtonProps>`
   `}
   
   /* Size styles */
-  ${({ size, theme }) => {
-    switch (size) {
+  ${({ $size, theme }) => {
+    switch ($size) {
       case 'small':
         return css`
           padding: ${theme.spacing.xs} ${theme.spacing.sm};
@@ -58,8 +58,8 @@ const StyledButton = styled.button<ButtonProps>`
   }}
   
   /* Variant styles */
-  ${({ variant, theme }) => {
-    switch (variant) {
+  ${({ $variant, theme }) => {
+    switch ($variant) {
       case 'secondary':
         return css`
           background-color: ${theme.colors.secondary.main};
@@ -110,17 +110,17 @@ const StyledButton = styled.button<ButtonProps>`
   
   /* Icon positioning */
   .button-icon {
-    ${({ iconPosition }) => iconPosition === 'left' && css`
+    ${({ $iconPosition }) => $iconPosition === 'left' && css`
       margin-right: 8px;
     `}
     
-    ${({ iconPosition }) => iconPosition === 'right' && css`
+    ${({ $iconPosition }) => $iconPosition === 'right' && css`
       margin-left: 8px;
     `}
   }
   
   /* Loading spinner */
-  ${({ isLoading }) => isLoading && css`
+  ${({ $isLoading }) => $isLoading && css`
     .button-content {
       visibility: hidden;
     }
@@ -148,26 +148,26 @@ const StyledButton = styled.button<ButtonProps>`
 
 export const Button: React.FC<ButtonProps> = ({
   children,
-  variant = 'primary',
-  size = 'medium',
-  fullWidth = false,
+  $variant = 'primary',
+  $size = 'medium',
+  $fullWidth = false,
   icon,
-  iconPosition = 'left',
-  isLoading = false,
+  $iconPosition = 'left',
+  $isLoading = false,
   ...props
 }) => {
   return (
     <StyledButton
-      variant={variant}
-      size={size}
-      fullWidth={fullWidth}
-      iconPosition={iconPosition}
-      isLoading={isLoading}
+      $variant={$variant}
+      $size={$size}
+      $fullWidth={$fullWidth}
+      $iconPosition={$iconPosition}
+      $isLoading={$isLoading}
       {...props}
     >
-      {icon && iconPosition === 'left' && <span className="button-icon">{icon}</span>}
+      {icon && $iconPosition === 'left' && <span className="button-icon">{icon}</span>}
       <span className="button-content">{children}</span>
-      {icon && iconPosition === 'right' && <span className="button-icon">{icon}</span>}
+      {icon && $iconPosition === 'right' && <span className="button-icon">{icon}</span>}
     </StyledButton>
   );
 };

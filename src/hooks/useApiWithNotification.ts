@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { AxiosResponse } from 'axios';
 import { useNotification } from '../contexts/NotificationContext';
 import { getErrorMessage } from '../utils/apiErrorHandler';
 
@@ -7,7 +6,7 @@ interface UseApiOptions {
   showSuccessNotification?: boolean;
   successMessage?: string;
   showErrorNotification?: boolean;
-  errorMessage?: string;
+  errorMessage?: string | ((error: any) => string);
 }
 
 export function useApiWithNotification(defaultOptions: UseApiOptions = {}) {
@@ -17,34 +16,41 @@ export function useApiWithNotification(defaultOptions: UseApiOptions = {}) {
 
   const callApi = useCallback(
     async <R>(
-      apiPromise: Promise<AxiosResponse<R>>,
-      options: UseApiOptions = {}
+      apiPromise: Promise<R>,
+      optionsOverride: UseApiOptions = {}
     ): Promise<R | null> => {
-      const {
-        showSuccessNotification = defaultOptions.showSuccessNotification ?? false,
-        successMessage = defaultOptions.successMessage ?? 'Operation completed successfully',
-        showErrorNotification = defaultOptions.showErrorNotification ?? true,
-        errorMessage = defaultOptions.errorMessage
-      } = options;
+      const mergedOptions: UseApiOptions = { ...defaultOptions, ...optionsOverride };
+
+      const showSuccessOpt = mergedOptions.showSuccessNotification ?? false;
+      const successMsgOpt = mergedOptions.successMessage ?? 'Operation completed successfully';
+      const showErrorOpt = mergedOptions.showErrorNotification ?? true;
+      const errorMsgOpt = mergedOptions.errorMessage;
 
       setLoading(true);
       setError(null);
 
       try {
-        const response = await apiPromise;
+        const result = await apiPromise;
         
-        if (showSuccessNotification) {
-          showSuccess(successMessage);
+        if (showSuccessOpt) {
+          showSuccess(successMsgOpt);
         }
         
         setLoading(false);
-        return response.data;
-      } catch (err) {
+        return result;
+      } catch (err: any) {
         setError(err as Error);
         
-        if (showErrorNotification) {
-          const finalErrorMessage = errorMessage || getErrorMessage(err);
-          showError(finalErrorMessage);
+        if (showErrorOpt) {
+          let msgToShow: string;
+          if (typeof errorMsgOpt === 'function') {
+            msgToShow = errorMsgOpt(err);
+          } else if (typeof errorMsgOpt === 'string') {
+            msgToShow = errorMsgOpt;
+          } else {
+            msgToShow = getErrorMessage(err);
+          }
+          showError(msgToShow);
         }
         
         setLoading(false);

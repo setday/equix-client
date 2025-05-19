@@ -90,14 +90,14 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   size = 'medium'
 }) => {
   return (
-    <Container size={size} elevation={0}>
+    <Container size={size} $elevation={0}>
       {icon && <IconWrapper size={size}>{icon}</IconWrapper>}
       <Title size={size}>{title}</Title>
       {description && <Description size={size}>{description}</Description>}
       {actionText && onAction && (
         <Button 
           onClick={onAction}
-          size={size === 'small' ? 'small' : size === 'large' ? 'large' : 'medium'}
+          $size={size === 'small' ? 'small' : size === 'large' ? 'large' : 'medium'}
         >
           {actionText}
         </Button>

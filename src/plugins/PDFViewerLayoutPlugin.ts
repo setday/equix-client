@@ -15,7 +15,7 @@ export interface LayoutPluginProps {
 export function layoutPlugin (props?: LayoutPluginProps): LayoutPlugin {
     var renderPageLayer = function (renderPageProps : any) {
         const layoutBlocks = props?.layout?.blocks
-            .filter((block) => block.pageNumber === renderPageProps.pageIndex)
+            .filter((block) => block.page_number === renderPageProps.pageIndex)
             .map((block, _) => props.renderLayoutBlock(block));
         return React.createElement(React.Fragment, null, layoutBlocks);
     };

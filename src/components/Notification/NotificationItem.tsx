@@ -34,7 +34,7 @@ const slideOut = keyframes`
   }
 `;
 
-const NotificationContainer = styled.div<{ type: NotificationType; isExiting: boolean }>`
+const NotificationContainer = styled.div<{ $type: NotificationType; $isExiting: boolean }>`
   display: flex;
   align-items: flex-start;
   padding: 14px 16px;
@@ -43,10 +43,10 @@ const NotificationContainer = styled.div<{ type: NotificationType; isExiting: bo
   box-shadow: ${({ theme }) => theme.shadows.md};
   min-width: 300px;
   max-width: 450px;
-  animation: ${({ isExiting }) => isExiting ? css`${slideOut} 0.3s forwards` : css`${slideIn} 0.3s forwards`};
+  animation: ${({ $isExiting }) => $isExiting ? css`${slideOut} 0.3s forwards` : css`${slideIn} 0.3s forwards`};
   
-  ${({ type, theme }) => {
-    switch (type) {
+  ${({ $type, theme }) => {
+    switch ($type) {
       case 'error':
         return css`
           background-color: #2a1215;
@@ -156,7 +156,7 @@ export const NotificationItem: React.FC<NotificationProps> = ({
   };
 
   return (
-    <NotificationContainer type={type} isExiting={isExiting}>
+    <NotificationContainer $type={type} $isExiting={isExiting}>
       <IconContainer className="icon-container">
         {getIcon()}
       </IconContainer>

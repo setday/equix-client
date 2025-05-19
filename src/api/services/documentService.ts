@@ -24,8 +24,6 @@ export const documentService = {
       }
     );
 
-    console.log('Layout extraction response:', response.data);
-
     return response.data;
   },
 
