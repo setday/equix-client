@@ -1,11 +1,21 @@
-import React, { useState, useEffect, useRef } from "react";
-import styled from 'styled-components';
-import { ChevronRight, ChevronLeft, UploadCloud, MessageCircle } from 'react-feather';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import styled from "styled-components";
+import {
+  ChevronRight,
+  ChevronLeft,
+  UploadCloud,
+  MessageCircle,
+} from "react-feather";
 import PDFViewerContainer from "../containers/PDFViewerContainer";
-import ChatContainer from "../containers/ChatContainer";
+import ChatContainer, {
+  ChatContainerHandle,
+} from "../containers/ChatContainer";
 import { useFileDropHandler } from "../hooks/useFileDropHandler";
 import AppHeader from "../components/AppHeader/AppHeader";
+import SettingsPage from "./Settings/SettingsPage";
+import InfoPage from "./Info/InfoPage";
 import { usePDFFileStore } from "../stores/pdfFileStore";
+import { ChatMessage } from "../types";
 
 const AppContainer = styled.div`
   display: flex;
@@ -23,34 +33,41 @@ const MainContent = styled.main`
   position: relative;
 `;
 
-const LeftPanel = styled.div`
+const LeftPanel = styled.div<{ $chatVisible: boolean }>`
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   position: relative;
   margin: ${({ theme }) => theme.spacing.md};
-  margin-right: 0;
+  margin-right: ${({ $chatVisible }) => ($chatVisible ? "380px" : "0")};
+  transition: margin-right ${({ theme }) => theme.transitions.default};
 `;
 
 const RightPanel = styled.div<{ $isVisible: boolean }>`
-  width: ${({ $isVisible }) => ($isVisible ? '380px' : '0')};
-  transition: width ${({ theme }) => theme.transitions.default};
+  position: absolute;
+  top: ${({ theme }) => theme.spacing.md};
+  right: 0;
+  bottom: ${({ theme }) => theme.spacing.md};
+  width: 380px;
+  transform: translateX(${({ $isVisible }) => ($isVisible ? "0" : "100%")});
+  transition: transform ${({ theme }) => theme.transitions.default};
   overflow: hidden;
-  margin-top: ${({ theme }) => theme.spacing.md};
-  margin-bottom: ${({ theme }) => theme.spacing.md};
+  z-index: 10;
 `;
 
 const ToggleChatButton = styled.button<{ $isVisible: boolean }>`
   position: absolute;
-  right: ${({ $isVisible }) => ($isVisible ? '380px' : '0px')};
+  right: ${({ $isVisible }) => ($isVisible ? "380px" : "0px")};
   top: 50%;
   transform: translateY(-50%);
   width: 32px;
   height: 80px;
-  background-color: ${({ theme }) => theme.colors.background.tertiary || theme.colors.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.colors.background.tertiary || theme.colors.background.secondary};
   border: none;
-  border-radius: ${({ theme }) => theme.borderRadius.sm} 0 0 ${({ theme }) => theme.borderRadius.sm};
+  border-radius: ${({ theme }) => theme.borderRadius.sm} 0 0
+    ${({ theme }) => theme.borderRadius.sm};
   color: ${({ theme }) => theme.colors.text.primary};
   cursor: pointer;
   display: flex;
@@ -58,10 +75,11 @@ const ToggleChatButton = styled.button<{ $isVisible: boolean }>`
   align-items: center;
   justify-content: center;
   gap: ${({ theme }) => theme.spacing.sm};
-  transition: right ${({ theme }) => theme.transitions.default},
-              background-color ${({ theme }) => theme.transitions.fast};
+  transition:
+    right ${({ theme }) => theme.transitions.default},
+    background-color ${({ theme }) => theme.transitions.fast};
   z-index: 100;
-  
+
   &:hover {
     background-color: ${({ theme }) => theme.colors.primary.main};
   }
@@ -73,7 +91,7 @@ const DropZone = styled.div<{ $isDragActive: boolean }>`
   left: 0;
   right: 0;
   bottom: 0;
-  display: ${({ $isDragActive }) => ($isDragActive ? 'flex' : 'none')};
+  display: ${({ $isDragActive }) => ($isDragActive ? "flex" : "none")};
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -82,17 +100,17 @@ const DropZone = styled.div<{ $isDragActive: boolean }>`
   pointer-events: none;
   border: 3px dashed ${({ theme }) => theme.colors.primary.main};
   border-radius: ${({ theme }) => theme.borderRadius.md};
-  
+
   svg {
     color: ${({ theme }) => theme.colors.primary.main};
     margin-bottom: ${({ theme }) => theme.spacing.md};
   }
-  
+
   h2 {
     color: ${({ theme }) => theme.colors.text.primary};
     margin-bottom: ${({ theme }) => theme.spacing.md};
   }
-  
+
   p {
     color: ${({ theme }) => theme.colors.text.secondary};
     text-align: center;
@@ -113,32 +131,33 @@ const FileInput = styled.input`
  */
 const MainLayout: React.FC = (): JSX.Element => {
   const [chatVisible, setChatVisible] = useState<boolean>(true);
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+  const [infoOpen, setInfoOpen] = useState<boolean>(false);
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
   const { fileDropHandler } = useFileDropHandler();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chatRef = useRef<ChatContainerHandle>(null);
   const { setPDFFile } = usePDFFileStore();
-  
+
   useEffect(() => {
-    // Set up the file drop handler and return unsubscribe function for cleanup
     let cleanupFn: () => void = () => {};
-    
+
     fileDropHandler()
-      .then(unlisten => {
+      .then((unlisten) => {
         cleanupFn = () => {
           unlisten();
         };
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Failed to set up file drop handler:", error);
       });
-    
-    // Set up drag enter/leave handling
+
     const handleDragEnter = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
       setIsDragActive(true);
     };
-    
+
     const handleDragLeave = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
@@ -146,60 +165,72 @@ const MainLayout: React.FC = (): JSX.Element => {
         setIsDragActive(false);
       }
     };
-    
-    document.addEventListener('dragenter', handleDragEnter);
-    document.addEventListener('dragleave', handleDragLeave);
-    document.addEventListener('dragover', (e) => {
+
+    document.addEventListener("dragenter", handleDragEnter);
+    document.addEventListener("dragleave", handleDragLeave);
+    document.addEventListener("dragover", (e) => {
       e.preventDefault();
       e.stopPropagation();
     });
-    document.addEventListener('drop', (e) => {
+    document.addEventListener("drop", (e) => {
       e.preventDefault();
       e.stopPropagation();
       setIsDragActive(false);
     });
-    
-    // Return cleanup function
+
     return () => {
       cleanupFn();
-      document.removeEventListener('dragenter', handleDragEnter);
-      document.removeEventListener('dragleave', handleDragLeave);
-      document.removeEventListener('dragover', (e) => e.preventDefault());
-      document.removeEventListener('drop', (e) => e.preventDefault());
+      document.removeEventListener("dragenter", handleDragEnter);
+      document.removeEventListener("dragleave", handleDragLeave);
+      document.removeEventListener("dragover", (e) => e.preventDefault());
+      document.removeEventListener("drop", (e) => e.preventDefault());
     };
-  }, [fileDropHandler]);
+  }, []);
+  const toggleChat = useCallback((): void => setChatVisible((prev) => !prev), []);
 
-  const toggleChat = (): void => setChatVisible(prev => !prev);
-  
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleSettingsToggle = useCallback((): void => setSettingsOpen((prev) => !prev), []);
+  const handleSettingsClose = useCallback((): void => setSettingsOpen(false), []);
+
+  const handleInfoToggle = useCallback((): void => setInfoOpen((prev) => !prev), []);
+  const handleInfoClose = useCallback((): void => setInfoOpen(false), []);
+
+  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const file = files[0];
-      if (file.type === 'application/pdf') {
+      if (file.type === "application/pdf") {
         setPDFFile(file);
       }
     }
-    
-    // Reset input value so the same file can be uploaded again if needed
+
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
-  };
-  
-  const triggerFileInput = (): void => {
+  }, [setPDFFile]);
+
+  const triggerFileInput = useCallback((): void => {
     fileInputRef.current?.click();
-  };
+  }, []);
+
+  const handleAddMessageToChat = useCallback((message: Partial<ChatMessage>) => {
+    if (chatRef.current) {
+      chatRef.current.addMessage(message);
+    }
+  }, []);
 
   return (
     <AppContainer>
-      <AppHeader onUploadClick={triggerFileInput} />
-      
+      <AppHeader
+        onUploadClick={triggerFileInput}
+        onSettingsClick={handleSettingsToggle}
+        onInfoClick={handleInfoToggle}
+      />
       <MainContent>
-        <LeftPanel>
-          <PDFViewerContainer />
+        <LeftPanel $chatVisible={chatVisible}>
+          <PDFViewerContainer onAddMessage={handleAddMessageToChat} />
         </LeftPanel>
-        
-        <ToggleChatButton 
+
+        <ToggleChatButton
           onClick={toggleChat}
           $isVisible={chatVisible}
           aria-label={chatVisible ? "Hide chat" : "Show chat"}
@@ -208,26 +239,29 @@ const MainLayout: React.FC = (): JSX.Element => {
           <MessageCircle size={16} />
           {chatVisible ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </ToggleChatButton>
-        
+
         <RightPanel $isVisible={chatVisible}>
-          <ChatContainer />
+          <ChatContainer ref={chatRef} />
         </RightPanel>
-        
+
         <DropZone $isDragActive={isDragActive}>
           <UploadCloud size={64} />
           <h2>Drop PDF File to Analyze</h2>
           <p>Release your file here to begin analysis</p>
         </DropZone>
-        
+
         <FileInputLabel htmlFor="pdf-upload">Upload PDF</FileInputLabel>
-        <FileInput 
+        <FileInput
           id="pdf-upload"
           ref={fileInputRef}
-          type="file" 
+          type="file"
           accept="application/pdf"
           onChange={handleFileUpload}
         />
       </MainContent>
+
+      <SettingsPage isOpen={settingsOpen} onClose={handleSettingsClose} />
+      <InfoPage isOpen={infoOpen} onClose={handleInfoClose} />
     </AppContainer>
   );
 };

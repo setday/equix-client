@@ -1,15 +1,16 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
+import React from "react";
+import styled, { css } from "styled-components";
 
-type ButtonVariant = 'primary' | 'secondary' | 'outlined' | 'text';
-type ButtonSize = 'small' | 'medium' | 'large';
+type ButtonVariant = "primary" | "secondary" | "outlined" | "text";
+type ButtonSize = "small" | "medium" | "large";
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   $variant?: ButtonVariant;
   $size?: ButtonSize;
   $fullWidth?: boolean;
   icon?: React.ReactNode;
-  $iconPosition?: 'left' | 'right';
+  $iconPosition?: "left" | "right";
   $isLoading?: boolean;
 }
 
@@ -26,25 +27,29 @@ const StyledButton = styled.button<ButtonProps>`
   border: none;
   cursor: pointer;
   white-space: nowrap;
-  
-  ${({ $fullWidth }) => $fullWidth && css`
-    width: 100%;
-  `}
-  
-  ${({ disabled }) => disabled && css`
-    opacity: 0.6;
-    cursor: not-allowed;
-  `}
+
+  ${({ $fullWidth }) =>
+    $fullWidth &&
+    css`
+      width: 100%;
+    `}
+
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      opacity: 0.6;
+      cursor: not-allowed;
+    `}
   
   /* Size styles */
   ${({ $size, theme }) => {
     switch ($size) {
-      case 'small':
+      case "small":
         return css`
           padding: ${theme.spacing.xs} ${theme.spacing.sm};
           font-size: ${theme.typography.fontSizes.xs};
         `;
-      case 'large':
+      case "large":
         return css`
           padding: ${theme.spacing.md} ${theme.spacing.lg};
           font-size: ${theme.typography.fontSizes.lg};
@@ -60,7 +65,7 @@ const StyledButton = styled.button<ButtonProps>`
   /* Variant styles */
   ${({ $variant, theme }) => {
     switch ($variant) {
-      case 'secondary':
+      case "secondary":
         return css`
           background-color: ${theme.colors.secondary.main};
           color: ${theme.colors.secondary.contrast};
@@ -71,7 +76,7 @@ const StyledButton = styled.button<ButtonProps>`
             background-color: ${theme.colors.secondary.dark};
           }
         `;
-      case 'outlined':
+      case "outlined":
         return css`
           background-color: transparent;
           color: ${theme.colors.primary.main};
@@ -83,7 +88,7 @@ const StyledButton = styled.button<ButtonProps>`
             background-color: ${theme.colors.highlight};
           }
         `;
-      case 'text':
+      case "text":
         return css`
           background-color: transparent;
           color: ${theme.colors.primary.main};
@@ -110,49 +115,55 @@ const StyledButton = styled.button<ButtonProps>`
   
   /* Icon positioning */
   .button-icon {
-    ${({ $iconPosition }) => $iconPosition === 'left' && css`
-      margin-right: 8px;
-    `}
-    
-    ${({ $iconPosition }) => $iconPosition === 'right' && css`
-      margin-left: 8px;
-    `}
+    ${({ $iconPosition }) =>
+      $iconPosition === "left" &&
+      css`
+        margin-right: 8px;
+      `}
+
+    ${({ $iconPosition }) =>
+      $iconPosition === "right" &&
+      css`
+        margin-left: 8px;
+      `}
   }
-  
+
   /* Loading spinner */
-  ${({ $isLoading }) => $isLoading && css`
-    .button-content {
-      visibility: hidden;
-    }
-    
-    &::after {
-      content: "";
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      top: calc(50% - 8px);
-      left: calc(50% - 8px);
-      border-radius: 50%;
-      border: 2px solid currentColor;
-      border-top-color: transparent;
-      animation: button-spin 0.8s linear infinite;
-    }
-    
-    @keyframes button-spin {
-      to {
-        transform: rotate(360deg);
+  ${({ $isLoading }) =>
+    $isLoading &&
+    css`
+      .button-content {
+        visibility: hidden;
       }
-    }
-  `}
+
+      &::after {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: calc(50% - 8px);
+        left: calc(50% - 8px);
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        animation: button-spin 0.8s linear infinite;
+      }
+
+      @keyframes button-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    `}
 `;
 
 export const Button: React.FC<ButtonProps> = ({
   children,
-  $variant = 'primary',
-  $size = 'medium',
+  $variant = "primary",
+  $size = "medium",
   $fullWidth = false,
   icon,
-  $iconPosition = 'left',
+  $iconPosition = "left",
   $isLoading = false,
   ...props
 }) => {
@@ -165,9 +176,13 @@ export const Button: React.FC<ButtonProps> = ({
       $isLoading={$isLoading}
       {...props}
     >
-      {icon && $iconPosition === 'left' && <span className="button-icon">{icon}</span>}
+      {icon && $iconPosition === "left" && (
+        <span className="button-icon">{icon}</span>
+      )}
       <span className="button-content">{children}</span>
-      {icon && $iconPosition === 'right' && <span className="button-icon">{icon}</span>}
+      {icon && $iconPosition === "right" && (
+        <span className="button-icon">{icon}</span>
+      )}
     </StyledButton>
   );
 };

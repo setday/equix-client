@@ -1,10 +1,16 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
+import React from "react";
+import styled, { css } from "styled-components";
 
-type IconButtonVariant = 'primary' | 'secondary' | 'outlined' | 'text';
-type IconButtonSize = 'small' | 'medium' | 'large';
+type IconButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outlined"
+  | "text"
+  | "ghost";
+type IconButtonSize = "small" | "medium" | "large";
 
-interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface IconButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   $variant?: IconButtonVariant;
   $size?: IconButtonSize;
   $isLoading?: boolean;
@@ -20,22 +26,24 @@ const StyledIconButton = styled.button<IconButtonProps>`
   outline: none;
   border: none;
   cursor: pointer;
-  
-  ${({ disabled }) => disabled && css`
-    opacity: 0.6;
-    cursor: not-allowed;
-  `}
-  
+
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      opacity: 0.6;
+      cursor: not-allowed;
+    `}
+
   /* Size styles */
   ${({ $size, theme }) => {
     switch ($size) {
-      case 'small':
+      case "small":
         return css`
           width: 32px;
           height: 32px;
           font-size: ${theme.typography.fontSizes.sm};
         `;
-      case 'large':
+      case "large":
         return css`
           width: 48px;
           height: 48px;
@@ -53,7 +61,7 @@ const StyledIconButton = styled.button<IconButtonProps>`
   /* Variant styles */
   ${({ $variant, theme }) => {
     switch ($variant) {
-      case 'secondary':
+      case "secondary":
         return css`
           background-color: ${theme.colors.secondary.main};
           color: ${theme.colors.secondary.contrast};
@@ -64,7 +72,7 @@ const StyledIconButton = styled.button<IconButtonProps>`
             background-color: ${theme.colors.secondary.dark};
           }
         `;
-      case 'outlined':
+      case "outlined":
         return css`
           background-color: transparent;
           color: ${theme.colors.primary.main};
@@ -76,12 +84,25 @@ const StyledIconButton = styled.button<IconButtonProps>`
             background-color: ${theme.colors.highlight};
           }
         `;
-      case 'text':
+      case "text":
         return css`
           background-color: transparent;
           color: ${theme.colors.primary.main};
           &:hover:not(:disabled) {
             background-color: ${theme.colors.highlight};
+          }
+          &:active:not(:disabled) {
+            background-color: ${theme.colors.highlight};
+          }
+        `;
+      case "ghost":
+        return css`
+          background-color: transparent;
+          color: ${theme.colors.text.secondary};
+          border: none;
+          &:hover:not(:disabled) {
+            background-color: ${theme.colors.highlight};
+            color: ${theme.colors.text.primary};
           }
           &:active:not(:disabled) {
             background-color: ${theme.colors.highlight};
@@ -102,36 +123,38 @@ const StyledIconButton = styled.button<IconButtonProps>`
   }}
   
   /* Loading spinner */
-  ${({ $isLoading }) => $isLoading && css`
-    .icon-content {
-      visibility: hidden;
-    }
-    
-    &::after {
-      content: "";
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      top: calc(50% - 8px);
-      left: calc(50% - 8px);
-      border-radius: 50%;
-      border: 2px solid currentColor;
-      border-top-color: transparent;
-      animation: button-spin 0.8s linear infinite;
-    }
-    
-    @keyframes button-spin {
-      to {
-        transform: rotate(360deg);
+  ${({ $isLoading }) =>
+    $isLoading &&
+    css`
+      .icon-content {
+        visibility: hidden;
       }
-    }
-  `}
+
+      &::after {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: calc(50% - 8px);
+        left: calc(50% - 8px);
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        animation: button-spin 0.8s linear infinite;
+      }
+
+      @keyframes button-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    `}
 `;
 
 export const IconButton: React.FC<IconButtonProps> = ({
   children,
-  $variant = 'text',
-  $size = 'medium',
+  $variant = "text",
+  $size = "medium",
   $isLoading = false,
   ...props
 }) => {

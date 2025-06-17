@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
+import { create } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
 
 interface FileMetadata {
   lastModified: number | null;
@@ -32,53 +32,53 @@ export const usePDFFileStore = create<PDFFileState>()(
       lastModified: null,
       name: null,
       size: null,
-      type: null
+      type: null,
     },
     isNewFile: false,
     isLoading: false,
     error: null,
-    
-    // Set a new PDF file and mark it as new
-    setPDFFile: (file: File) => set({
-      pdfFile: file,
-      fileMetadata: {
-        lastModified: file.lastModified,
-        name: file.name,
-        size: file.size,
-        type: file.type
-      },
-      isNewFile: true,
-      error: null
-    }),
-    
-    // Clear the current PDF file
-    clearPDFFile: () => set({
-      pdfFile: null,
-      fileMetadata: {
-        lastModified: null,
-        name: null,
-        size: null,
-        type: null
-      },
-      isNewFile: false,
-      isLoading: false,
-      error: null
-    }),
-    
-    // Acknowledge that the file has been processed
-    acknowledgeFile: () => set({
-      isNewFile: false
-    }),
-    
-    // Set loading state
-    setLoading: (loading: boolean) => set({
-      isLoading: loading
-    }),
-    
-    // Set error state
-    setError: (error: string | null) => set({
-      error,
-      isLoading: false
-    })
-  }))
+
+    setPDFFile: (file: File) =>
+      set({
+        pdfFile: file,
+        fileMetadata: {
+          lastModified: file.lastModified,
+          name: file.name,
+          size: file.size,
+          type: file.type,
+        },
+        isNewFile: true,
+        error: null,
+      }),
+
+    clearPDFFile: () =>
+      set({
+        pdfFile: null,
+        fileMetadata: {
+          lastModified: null,
+          name: null,
+          size: null,
+          type: null,
+        },
+        isNewFile: false,
+        isLoading: false,
+        error: null,
+      }),
+
+    acknowledgeFile: () =>
+      set({
+        isNewFile: false,
+      }),
+
+    setLoading: (loading: boolean) =>
+      set({
+        isLoading: loading,
+      }),
+
+    setError: (error: string | null) =>
+      set({
+        error,
+        isLoading: false,
+      }),
+  })),
 );

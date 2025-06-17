@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { BoundingBox, LayoutBlockType } from '../../types';
-import { MoreHorizontal, Copy, Download, Edit, Search, Table, Image, FileText, Code } from 'react-feather';
-import IconButton from '../UI/IconButton';
-import Tooltip from '../UI/Tooltip';
+import React, { useState } from "react";
+import styled from "styled-components";
+import { BoundingBox, LayoutBlockType } from "../../types";
+import {
+  MoreHorizontal,
+  Copy,
+  Search,
+  Table,
+  Image,
+  FileText,
+  Code,
+} from "react-feather";
+import IconButton from "../UI/IconButton";
+import Tooltip from "../UI/Tooltip";
 
 interface MarkupBlockProps {
   $blockType: LayoutBlockType;
@@ -17,19 +25,25 @@ interface ContextAction {
   label: string;
 }
 
-const StyledMarkupBlock = styled.div<{ $blockType: LayoutBlockType; $boundingBox: BoundingBox }>`
+const StyledMarkupBlock = styled.div<{
+  $blockType: LayoutBlockType;
+  $boundingBox: BoundingBox;
+}>`
   position: absolute;
   border-radius: ${({ theme }) => theme.borderRadius.md};
   border: 2px dashed;
   opacity: 0.6;
   pointer-events: all;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
   top: ${({ $boundingBox }) => $boundingBox.y * 100}%;
   left: ${({ $boundingBox }) => $boundingBox.x * 100}%;
   width: ${({ $boundingBox }) => $boundingBox.width * 100}%;
   height: ${({ $boundingBox }) => $boundingBox.height * 100}%;
-  
+  z-index: 2;
+
   ${({ $blockType }) => {
     switch ($blockType) {
       case LayoutBlockType.TEXT:
@@ -59,10 +73,9 @@ const StyledMarkupBlock = styled.div<{ $blockType: LayoutBlockType; $boundingBox
         `;
     }
   }}
-  
+
   &:hover {
-    opacity: 0.8;
-    transform: scale(1.005);
+    opacity: 1;
   }
 `;
 
@@ -73,7 +86,7 @@ const ContextButtonContainer = styled.div`
   z-index: 5;
   transition: opacity 0.2s;
   opacity: 0;
-  
+
   ${StyledMarkupBlock}:hover & {
     opacity: 1;
   }
@@ -83,14 +96,14 @@ const ContextActionsContainer = styled.div<{ $isVisible: boolean }>`
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  display: ${({ $isVisible }) => ($isVisible ? 'flex' : 'none')};
+  display: ${({ $isVisible }) => ($isVisible ? "flex" : "none")};
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.xs};
   background-color: ${({ theme }) => theme.colors.background.secondary};
   border-radius: ${({ theme }) => theme.borderRadius.md};
   padding: ${({ theme }) => theme.spacing.xs};
   box-shadow: ${({ theme }) => theme.shadows.md};
-  min-width: 120px;
+  min-width: 200px;
   z-index: 10;
 `;
 
@@ -107,11 +120,12 @@ const ContextActionButton = styled.button`
   width: 100%;
   text-align: left;
   font-size: ${({ theme }) => theme.typography.fontSizes.sm};
-  
+  line-height: 1.2;
+
   &:hover {
     background-color: ${({ theme }) => theme.colors.highlight};
   }
-  
+
   svg {
     width: 16px;
     height: 16px;
@@ -124,61 +138,86 @@ const ContextButton = styled(IconButton)`
   width: 28px;
   height: 28px;
   padding: 4px;
-  
+
   &:hover {
     transform: scale(1.1);
   }
-  
+
   svg {
     width: 16px;
     height: 16px;
   }
 `;
 
-const MarkupBlock: React.FC<MarkupBlockProps> = ({ $blockType, $boundingBox, onContextAction }) => {
+const MarkupBlock: React.FC<MarkupBlockProps> = ({
+  $blockType,
+  $boundingBox,
+  onContextAction,
+}) => {
   const [showContextMenu, setShowContextMenu] = useState(false);
-  
-  // Define context actions based on block type
+
   const getContextActions = (): ContextAction[] => {
-    const commonActions = [
-      { id: 'copy', icon: <Copy size={16} />, label: 'Copy content' },
-    ];
-    
     switch ($blockType) {
       case LayoutBlockType.TEXT:
         return [
-          ...commonActions,
-          { id: 'search', icon: <Search size={16} />, label: 'Search in text' },
-          { id: 'annotate', icon: <Edit size={16} />, label: 'Add annotation' }
+          { id: "copy", icon: <Copy />, label: "Copy content" },
+          { id: "ask", icon: <Search />, label: "Ask about text" },
         ];
       case LayoutBlockType.TABLE:
         return [
-          ...commonActions,
-          { id: 'extract', icon: <Table size={16} />, label: 'Extract table' },
-          { id: 'download', icon: <Download size={16} />, label: 'Download as CSV' }
+          {
+            id: "extract_md",
+            icon: <Table />,
+            label: "Extract as MD",
+          },
+          {
+            id: "extract_csv",
+            icon: <FileText />,
+            label: "Extract as CSV",
+          },
+          {
+            id: "extract_image",
+            icon: <Image />,
+            label: "Extract image",
+          },
+          // { id: "edit", icon: <Edit />, label: "Edit table" },
+          { id: "ask", icon: <Search />, label: "Ask about table" },
         ];
       case LayoutBlockType.PICTURE:
         return [
-          ...commonActions,
-          { id: 'save', icon: <Image size={16} />, label: 'Save image' },
-          { id: 'analyze', icon: <Search size={16} />, label: 'Analyze image' }
+          {
+            id: "save_image",
+            icon: <Image />,
+            label: "Save image",
+          },
+          { id: "ask", icon: <Search />, label: "Ask about image" },
         ];
-      case LayoutBlockType.CAPTION:
+      case LayoutBlockType.CHART:
         return [
-          ...commonActions,
-          { id: 'bookmark', icon: <FileText size={16} />, label: 'Add bookmark' },
+          {
+            id: "extract_code",
+            icon: <Code />,
+            label: "Extract data as code",
+          },
+          { id: "ask", icon: <Search />, label: "Ask about chart" },
+        ];
+      case LayoutBlockType.FORMULA:
+        return [
+          {
+            id: "copy",
+            icon: <Copy />,
+            label: "Copy formula as latex",
+          },
+          { id: "ask", icon: <Search />, label: "Ask about formula" },
         ];
       default:
-        return [
-          ...commonActions,
-          { id: 'identify', icon: <Code size={16} />, label: 'Identify content' }
-        ];
+        return [];
     }
   };
 
   const handleContextButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowContextMenu(prev => !prev);
+    setShowContextMenu((prev) => !prev);
   };
 
   const handleActionClick = (actionId: string) => {
@@ -196,40 +235,44 @@ const MarkupBlock: React.FC<MarkupBlockProps> = ({ $blockType, $boundingBox, onC
 
   React.useEffect(() => {
     if (showContextMenu) {
-      document.addEventListener('click', handleOutsideClick);
+      document.addEventListener("click", handleOutsideClick);
     }
-    
+
     return () => {
-      document.removeEventListener('click', handleOutsideClick);
+      document.removeEventListener("click", handleOutsideClick);
     };
   }, [showContextMenu]);
 
   return (
-    <StyledMarkupBlock $blockType={$blockType} $boundingBox={$boundingBox}>
-      <ContextButtonContainer>
-        <Tooltip content={`${$blockType.charAt(0).toUpperCase() + $blockType.slice(1)} block options`}>
-          <ContextButton 
-            $variant="text" 
-            onClick={handleContextButtonClick}
-            aria-label="Context menu"
-          >
-            <MoreHorizontal size={16} />
-          </ContextButton>
-        </Tooltip>
-        
-        <ContextActionsContainer $isVisible={showContextMenu}>
-          {getContextActions().map(action => (
-            <ContextActionButton
-              key={action.id}
-              onClick={() => handleActionClick(action.id)}
+    <>
+      <StyledMarkupBlock $blockType={$blockType} $boundingBox={$boundingBox}>
+        <ContextButtonContainer>
+          <Tooltip content={`${$blockType.toLowerCase()} block options`}>
+            <ContextButton
+              $variant="text"
+              onClick={handleContextButtonClick}
+              aria-label="Context menu"
             >
-              {action.icon}
-              {action.label}
-            </ContextActionButton>
-          ))}
-        </ContextActionsContainer>
-      </ContextButtonContainer>
-    </StyledMarkupBlock>
+              <MoreHorizontal size={16} />
+            </ContextButton>
+          </Tooltip>
+
+          <ContextActionsContainer $isVisible={showContextMenu}>
+            {getContextActions().map((action) => (
+              <ContextActionButton
+                key={action.id}
+                onClick={() => {
+                  handleActionClick(action.id);
+                }}
+              >
+                {action.icon}
+                {action.label}
+              </ContextActionButton>
+            ))}
+          </ContextActionsContainer>
+        </ContextButtonContainer>
+      </StyledMarkupBlock>
+    </>
   );
 };
 

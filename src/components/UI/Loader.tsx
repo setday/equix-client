@@ -1,8 +1,8 @@
-import React from 'react';
-import styled, { keyframes } from 'styled-components';
+import React from "react";
+import styled, { keyframes } from "styled-components";
 
 interface LoaderProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
   color?: string;
   center?: boolean;
   fullPage?: boolean;
@@ -18,20 +18,24 @@ const LoaderContainer = styled.div<{ center?: boolean; fullPage?: boolean }>`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  
-  ${({ center }) => center && `
+
+  ${({ center }) =>
+    center &&
+    `
     height: 100%;
     width: 100%;
   `}
-  
-  ${({ fullPage }) => fullPage && `
+
+  ${({ fullPage, theme }) =>
+    fullPage &&
+    `
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background-color: rgba(26, 30, 39, 0.7);
-    z-index: ${({ theme }) => theme.zIndex.modal};
+    z-index: ${theme.zIndex.modal};
     backdrop-filter: blur(2px);
   `}
 `;
@@ -47,7 +51,8 @@ const Spinner = styled.div<{ size: string; customColor?: string }>`
   height: ${({ size }) => size};
   border: ${({ size }) => parseInt(size) / 8}px solid rgba(67, 97, 238, 0.2);
   border-radius: 50%;
-  border-top-color: ${({ theme, customColor }) => customColor || theme.colors.primary.main};
+  border-top-color: ${({ theme, customColor }) =>
+    customColor || theme.colors.primary.main};
   animation: ${spin} 1s linear infinite;
 `;
 
@@ -57,22 +62,22 @@ const LoadingText = styled.p`
   font-size: ${({ theme }) => theme.typography.fontSizes.md};
 `;
 
-const Loader: React.FC<LoaderProps> = ({ 
-  size = 'medium', 
+const Loader: React.FC<LoaderProps> = ({
+  size = "medium",
   color,
   center = false,
   fullPage = false,
-  text
+  text,
 }) => {
   const getSizeInPixels = () => {
     switch (size) {
-      case 'small':
-        return '24px';
-      case 'large':
-        return '56px';
-      case 'medium':
+      case "small":
+        return "24px";
+      case "large":
+        return "56px";
+      case "medium":
       default:
-        return '40px';
+        return "40px";
     }
   };
 

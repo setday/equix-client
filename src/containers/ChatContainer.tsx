@@ -1,17 +1,36 @@
+import React, {
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import Chat from "../components/Chat/Chat";
 import { usePDFFileStore } from "../stores/pdfFileStore";
-import { useRef, useEffect } from "react";
+import { ChatMessage } from "../types";
+
+export interface ChatContainerHandle {
+  addMessage: (message: Partial<ChatMessage>) => void;
+}
 
 /**
  * Container for handling Chat component state and logic
  */
-const ChatContainer: React.FC = (): JSX.Element => {
+const ChatContainer = forwardRef<ChatContainerHandle>((_, ref) => {
   const { pdfFile, fileMetadata, isNewFile } = usePDFFileStore();
   const chatRef = useRef<() => void>();
+  const addMessageRef = useRef<(message: Partial<ChatMessage>) => void>();
+
+  useImperativeHandle(ref, () => ({
+    addMessage: (message: Partial<ChatMessage>) => {
+      if (addMessageRef.current) {
+        addMessageRef.current(message);
+      }
+    },
+  }));
 
   useEffect(() => {
     if (isNewFile && chatRef.current) {
-      chatRef.current(); // Clear chat messages when a new file is loaded
+      chatRef.current();
     }
   }, [isNewFile]);
 
@@ -19,9 +38,12 @@ const ChatContainer: React.FC = (): JSX.Element => {
     <Chat
       pdfFile={pdfFile}
       fileName={fileMetadata.name || undefined}
-      onClearMessages={(clearFn) => (chatRef.current = clearFn)} // Store the clear function
+      onClearMessages={(clearFn) => (chatRef.current = clearFn)}
+      onRegisterAddMessage={(addFn) => (addMessageRef.current = addFn)}
     />
   );
-};
+});
 
-export default ChatContainer;
+ChatContainer.displayName = "ChatContainer";
+
+export default React.memo(ChatContainer);

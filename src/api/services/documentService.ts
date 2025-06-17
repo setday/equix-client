@@ -1,5 +1,5 @@
-import { apiClient } from '../index';
-import { LayoutResponse, GraphicsExtractionResponse } from '../../types';
+import { apiClient } from "../index";
+import { LayoutResponse, GraphicsExtractionResponse } from "../../types";
 
 /**
  * Service for document-related API operations
@@ -12,16 +12,16 @@ export const documentService = {
    */
   extractLayout: async (file: File): Promise<LayoutResponse> => {
     const formData = new FormData();
-    formData.append('document', file);
+    formData.append("document", file);
 
     const response = await apiClient.post<LayoutResponse>(
-      '/layout-extraction',
-      formData, 
+      "/layout-extraction",
+      formData,
       {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
-      }
+      },
     );
 
     return response.data;
@@ -37,13 +37,17 @@ export const documentService = {
   extractGraphics: async (
     documentId: string,
     blockId: number,
-    format: 'Markdown' | 'HTML' | 'Plain' = 'Markdown'
+    format: "text" | "md" | "code" | "csv" | "json" = "text",
+    prompt?: string,
   ): Promise<GraphicsExtractionResponse> => {
-    const response = await apiClient.get<GraphicsExtractionResponse>(
-      `/graphics-extraction/${documentId}/blocks/${blockId}/graphics`,
+    const response = await apiClient.post<GraphicsExtractionResponse>(
+      `/graphics-extraction`,
       {
-        params: { format }
-      }
+        document_id: documentId,
+        layout_block_id: blockId,
+        output_type: format,
+        prompt: prompt,
+      },
     );
 
     return response.data;
@@ -55,11 +59,18 @@ export const documentService = {
    * @param question Question text
    * @returns Promise with answer response
    */
-  askQuestion: async (documentId: string, question: string): Promise<{answer: string}> => {
-    const response = await apiClient.post(`/documents/${documentId}/query`, {
-      prompt: question
-    });
-    
+  askQuestion: async (
+    documentId: string,
+    question: string,
+  ): Promise<{ answer: string }> => {
+    const response = await apiClient.post<{ answer: string }>(
+      `/information-extraction`,
+      {
+        prompt: question,
+        document_id: documentId,
+      },
+    );
+
     return response.data;
-  }
+  },
 };

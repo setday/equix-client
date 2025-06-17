@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import styled, { css, keyframes } from 'styled-components';
-import { X, AlertCircle, CheckCircle, AlertTriangle, Info } from 'react-feather';
+import React, { useEffect, useState } from "react";
+import styled, { css, keyframes } from "styled-components";
+import {
+  X,
+  AlertCircle,
+  CheckCircle,
+  AlertTriangle,
+  Info,
+} from "react-feather";
 
-export type NotificationType = 'error' | 'success' | 'warning' | 'info';
+export type NotificationType = "error" | "success" | "warning" | "info";
 
 export interface NotificationProps {
   id: string;
@@ -34,7 +40,10 @@ const slideOut = keyframes`
   }
 `;
 
-const NotificationContainer = styled.div<{ $type: NotificationType; $isExiting: boolean }>`
+const NotificationContainer = styled.div<{
+  $type: NotificationType;
+  $isExiting: boolean;
+}>`
   display: flex;
   align-items: flex-start;
   padding: 14px 16px;
@@ -43,38 +52,47 @@ const NotificationContainer = styled.div<{ $type: NotificationType; $isExiting: 
   box-shadow: ${({ theme }) => theme.shadows.md};
   min-width: 300px;
   max-width: 450px;
-  animation: ${({ $isExiting }) => $isExiting ? css`${slideOut} 0.3s forwards` : css`${slideIn} 0.3s forwards`};
-  
+  animation: ${({ $isExiting }) =>
+    $isExiting
+      ? css`
+          ${slideOut} 0.3s forwards
+        `
+      : css`
+          ${slideIn} 0.3s forwards
+        `};
+
   ${({ $type, theme }) => {
+    const isDarkMode = theme.colors.background.primary === "#242933";
+
     switch ($type) {
-      case 'error':
+      case "error":
         return css`
-          background-color: #2a1215;
+          background-color: ${isDarkMode ? "#2a1215" : "#fef2f2"};
           border-left: 4px solid ${theme.colors.error};
           .icon-container {
             color: ${theme.colors.error};
           }
         `;
-      case 'success':
+      case "success":
         return css`
-          background-color: #162312;
+          background-color: ${isDarkMode ? "#162312" : "#f0fdf4"};
           border-left: 4px solid ${theme.colors.success};
           .icon-container {
             color: ${theme.colors.success};
           }
         `;
-      case 'warning':
+      case "warning":
         return css`
-          background-color: #2b2111;
+          background-color: ${isDarkMode ? "#2b2111" : "#fffbeb"};
           border-left: 4px solid ${theme.colors.warning};
           .icon-container {
             color: ${theme.colors.warning};
           }
         `;
-      case 'info':
+      case "info":
       default:
         return css`
-          background-color: #111d2c;
+          background-color: ${isDarkMode ? "#111d2c" : "#eff6ff"};
           border-left: 4px solid ${theme.colors.info};
           .icon-container {
             color: ${theme.colors.info};
@@ -110,24 +128,23 @@ const CloseButton = styled.button`
   justify-content: center;
   margin-left: auto;
   padding: 4px;
-  
+
   &:hover {
     color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
-export const NotificationItem: React.FC<NotificationProps> = ({ 
-  id, 
-  type, 
-  message, 
+export const NotificationItem: React.FC<NotificationProps> = ({
+  id,
+  type,
+  message,
   duration = 5000,
-  onClose 
+  onClose,
 }) => {
   const [isExiting, setIsExiting] = useState(false);
-  
+
   const handleClose = () => {
     setIsExiting(true);
-    // Wait for exit animation to complete
     setTimeout(() => onClose(id), 300);
   };
 
@@ -136,20 +153,20 @@ export const NotificationItem: React.FC<NotificationProps> = ({
       const timer = setTimeout(() => {
         handleClose();
       }, duration);
-      
+
       return () => clearTimeout(timer);
     }
   }, [id, duration]);
 
   const getIcon = () => {
     switch (type) {
-      case 'error':
+      case "error":
         return <AlertCircle size={20} />;
-      case 'success':
+      case "success":
         return <CheckCircle size={20} />;
-      case 'warning':
+      case "warning":
         return <AlertTriangle size={20} />;
-      case 'info':
+      case "info":
       default:
         return <Info size={20} />;
     }
@@ -157,9 +174,7 @@ export const NotificationItem: React.FC<NotificationProps> = ({
 
   return (
     <NotificationContainer $type={type} $isExiting={isExiting}>
-      <IconContainer className="icon-container">
-        {getIcon()}
-      </IconContainer>
+      <IconContainer className="icon-container">{getIcon()}</IconContainer>
       <Content>{message}</Content>
       <CloseButton onClick={handleClose} aria-label="Close notification">
         <X size={16} />

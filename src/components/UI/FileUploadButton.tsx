@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
-import styled from 'styled-components';
-import { UploadCloud } from 'react-feather';
-import Button, { ButtonProps } from './Button';
+import React, { useRef } from "react";
+import styled from "styled-components";
+import { UploadCloud } from "react-feather";
+import Button, { ButtonProps } from "./Button";
 
-interface FileUploadButtonProps extends Omit<ButtonProps, 'onChange'> {
+interface FileUploadButtonProps extends Omit<ButtonProps, "onChange"> {
   acceptedFileTypes?: string;
   multiple?: boolean;
   onChange: (files: FileList | null) => void;
@@ -15,10 +15,10 @@ const HiddenInput = styled.input`
 `;
 
 const FileUploadButton: React.FC<FileUploadButtonProps> = ({
-  acceptedFileTypes = '*',
+  acceptedFileTypes = "*",
   multiple = false,
   onChange,
-  buttonText = 'Upload File',
+  buttonText = "Upload File",
   ...buttonProps
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -31,10 +31,9 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.files);
-    
-    // Reset the input value so the same file can be selected again
+
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 

@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import NotificationItem, { NotificationProps } from './NotificationItem';
+import React from "react";
+import styled from "styled-components";
+import NotificationItem, { NotificationProps } from "./NotificationItem";
 
 const Container = styled.div`
   position: fixed;
@@ -11,28 +11,28 @@ const Container = styled.div`
   flex-direction: column;
   align-items: flex-end;
   pointer-events: none;
-  
+
   & > * {
     pointer-events: auto;
   }
 `;
 
 interface NotificationContainerProps {
-  notifications: Omit<NotificationProps, 'onClose'>[];
+  notifications: Omit<NotificationProps, "onClose">[];
   onClose: (id: string) => void;
 }
 
-export const NotificationContainer: React.FC<NotificationContainerProps> = ({ 
-  notifications, 
-  onClose 
+export const NotificationContainer: React.FC<NotificationContainerProps> = ({
+  notifications,
+  onClose,
 }) => {
   return (
     <Container>
       {notifications.map((notification) => (
-        <NotificationItem 
-          key={notification.id} 
-          {...notification} 
-          onClose={onClose} 
+        <NotificationItem
+          key={notification.id}
+          {...notification}
+          onClose={onClose}
         />
       ))}
     </Container>

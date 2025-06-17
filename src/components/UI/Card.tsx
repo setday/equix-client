@@ -1,5 +1,5 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
+import React from "react";
+import styled, { css } from "styled-components";
 
 interface CardProps {
   $elevation?: 0 | 1 | 2 | 3;
@@ -15,20 +15,32 @@ const StyledCard = styled.div<CardProps>`
   background-color: ${({ theme }) => theme.colors.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   overflow: hidden;
-  
-  ${({ $fullWidth }) => $fullWidth && css`
-    width: 100%;
-  `}
-  
+
+  ${({ $fullWidth }) =>
+    $fullWidth &&
+    css`
+      width: 100%;
+    `}
+
   ${({ $padding, theme }) => {
-    if ($padding === false) return css`padding: 0;`;
-    if (typeof $padding === 'string') return css`padding: ${$padding};`;
-    return css`padding: ${theme.spacing.md};`;
+    if ($padding === false)
+      return css`
+        padding: 0;
+      `;
+    if (typeof $padding === "string")
+      return css`
+        padding: ${$padding};
+      `;
+    return css`
+      padding: ${theme.spacing.md};
+    `;
   }}
   
-  ${({ $margin }) => $margin && css`
-    margin: ${$margin};
-  `}
+  ${({ $margin }) =>
+    $margin &&
+    css`
+      margin: ${$margin};
+    `}
   
   ${({ $elevation, theme }) => {
     switch ($elevation) {
@@ -54,17 +66,17 @@ const StyledCard = styled.div<CardProps>`
   }}
 `;
 
-const Card: React.FC<CardProps> = ({ 
-  children, 
-  $elevation = 1, 
-  $padding = true, 
+const Card: React.FC<CardProps> = ({
+  children,
+  $elevation = 1,
+  $padding = true,
   $margin,
   $fullWidth = false,
   $className,
   $isLoading = false,
 }) => {
   return (
-    <StyledCard 
+    <StyledCard
       $elevation={$elevation}
       $padding={$padding}
       $margin={$margin}

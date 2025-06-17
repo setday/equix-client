@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
-import { useNotification } from '../contexts/NotificationContext';
-import { getErrorMessage } from '../utils/apiErrorHandler';
+import { useState, useCallback } from "react";
+import { useNotification } from "./NotificationContext";
+import { getErrorMessage } from "../../api/services/apiErrorHandler";
 
 interface UseApiOptions {
   showSuccessNotification?: boolean;
@@ -17,12 +17,16 @@ export function useApiWithNotification(defaultOptions: UseApiOptions = {}) {
   const callApi = useCallback(
     async <R>(
       apiPromise: Promise<R>,
-      optionsOverride: UseApiOptions = {}
+      optionsOverride: UseApiOptions = {},
     ): Promise<R | null> => {
-      const mergedOptions: UseApiOptions = { ...defaultOptions, ...optionsOverride };
+      const mergedOptions: UseApiOptions = {
+        ...defaultOptions,
+        ...optionsOverride,
+      };
 
       const showSuccessOpt = mergedOptions.showSuccessNotification ?? false;
-      const successMsgOpt = mergedOptions.successMessage ?? 'Operation completed successfully';
+      const successMsgOpt =
+        mergedOptions.successMessage ?? "Operation completed successfully";
       const showErrorOpt = mergedOptions.showErrorNotification ?? true;
       const errorMsgOpt = mergedOptions.errorMessage;
 
@@ -31,38 +35,38 @@ export function useApiWithNotification(defaultOptions: UseApiOptions = {}) {
 
       try {
         const result = await apiPromise;
-        
+
         if (showSuccessOpt) {
           showSuccess(successMsgOpt);
         }
-        
+
         setLoading(false);
         return result;
       } catch (err: any) {
         setError(err as Error);
-        
+
         if (showErrorOpt) {
           let msgToShow: string;
-          if (typeof errorMsgOpt === 'function') {
+          if (typeof errorMsgOpt === "function") {
             msgToShow = errorMsgOpt(err);
-          } else if (typeof errorMsgOpt === 'string') {
+          } else if (typeof errorMsgOpt === "string") {
             msgToShow = errorMsgOpt;
           } else {
             msgToShow = getErrorMessage(err);
           }
           showError(msgToShow);
         }
-        
+
         setLoading(false);
         return null;
       }
     },
-    [showSuccess, showError, defaultOptions]
+    [showSuccess, showError, defaultOptions],
   );
 
   return {
     loading,
     error,
-    callApi
+    callApi,
   };
 }

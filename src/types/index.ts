@@ -1,6 +1,5 @@
 // Common TypeScript interfaces for the application
 
-// PDF Document Types
 export interface PDFDocument {
   id: string;
   fileName: string;
@@ -9,7 +8,6 @@ export interface PDFDocument {
   createdAt: Date;
 }
 
-// Layout and Content Types
 export interface Coordinates {
   x: number;
   y: number;
@@ -23,33 +21,34 @@ export interface Dimensions {
 export interface BoundingBox extends Coordinates, Dimensions {}
 
 export enum LayoutBlockType {
-  UNKNOWN = 'unknown',
+  UNKNOWN = "UNKNOWN",
 
-  CAPTION = 'caption',
-  FOOTNOTE = 'footnote',
-  FORMULA = 'formula',
-  
-  LIST_ITEM = 'list_item',
-  
-  PAGE_FOOTER = 'page_footer',
-  PAGE_HEADER = 'page_header',
+  CAPTION = "CAPTION",
+  FOOTNOTE = "FOOTNOTE",
+  FORMULA = "FORMULA",
 
-  PICTURE = 'picture',
+  LIST_ITEM = "LIST_ITEM",
 
-  SECTION_HEADER = 'section_header',
+  PAGE_FOOTER = "PAGE_FOOTER",
+  PAGE_HEADER = "PAGE_HEADER",
 
-  TABLE = 'table',
-  TEXT = 'text',
+  PICTURE = "PICTURE",
 
-  CHART = 'chart',
+  SECTION_HEADER = "SECTION_HEADER",
+
+  TABLE = "TABLE",
+  TEXT = "TEXT",
+
+  CHART = "CHART",
 }
+
 export enum LayoutBlockSpecification {
-  UNKNOWN = 'unknown',
-  HEADER = 'header',
-  FOOTER = 'footer',
-  ANNOTATION = 'annotation',
-  CAPTION = 'caption',
-  PAGE_NUMBER = 'page_number',
+  UNKNOWN = "UNKNOWN",
+  HEADER = "HEADER",
+  FOOTER = "FOOTER",
+  ANNOTATION = "ANNOTATION",
+  CAPTION = "CAPTION",
+  PAGE_NUMBER = "PAGE_NUMBER",
 }
 
 export interface LayoutBlock {
@@ -72,7 +71,6 @@ export interface DocumentLayout {
   metadata?: Record<string, unknown>;
 }
 
-// API Response Types
 export interface LayoutResponse {
   layout: DocumentLayout;
   document_id: string;
@@ -82,11 +80,10 @@ export interface LayoutResponse {
 export interface GraphicsExtractionResponse {
   text: string;
   blockId: number;
-  format: 'Markdown' | 'HTML' | 'Plain';
-  status: 'success' | 'error';
+  format: "text" | "md" | "code" | "csv" | "json";
+  status: "success" | "error";
 }
 
-// Message Types
 export interface ChatMessage {
   id: string;
   text: string;
@@ -94,4 +91,13 @@ export interface ChatMessage {
   timestamp: Date;
   isLoading?: boolean;
   error?: string;
+  type?: "user" | "system" | "markup_action" | "ask_prompt";
+  markupInfo?: {
+    blockType: LayoutBlockType;
+    action: string;
+    blockId: number;
+    format?: string;
+    imageData?: string; // base64 image data for block preview
+    questionText?: string; // for ask actions - the actual question text
+  };
 }

@@ -1,6 +1,6 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import styled from 'styled-components';
-import { AlertTriangle } from 'react-feather';
+import { Component, ErrorInfo, ReactNode } from "react";
+import styled from "styled-components";
+import { AlertTriangle } from "react-feather";
 
 interface Props {
   children: ReactNode;
@@ -61,7 +61,7 @@ const ResetButton = styled.button`
   font-weight: 500;
   font-size: 1rem;
   transition: background-color 0.2s;
-  
+
   &:hover {
     background-color: #3a0ca3;
   }
@@ -72,19 +72,19 @@ class ErrorBoundary extends Component<Props, State> {
     super(props);
     this.state = {
       hasError: false,
-      error: null
+      error: null,
     };
   }
 
   static getDerivedStateFromError(error: Error): State {
     return {
       hasError: true,
-      error
+      error,
     };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+    console.error("Error caught by ErrorBoundary:", error, errorInfo);
   }
 
   render(): ReactNode {
@@ -92,7 +92,7 @@ class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) {
         return this.props.fallback;
       }
-      
+
       return (
         <ErrorContainer>
           <ErrorIcon>
@@ -100,9 +100,13 @@ class ErrorBoundary extends Component<Props, State> {
           </ErrorIcon>
           <ErrorTitle>Something went wrong</ErrorTitle>
           <ErrorMessage>
-            {this.state.error?.stack || this.state.error?.message || 'Unknown error'}
+            {this.state.error?.stack ||
+              this.state.error?.message ||
+              "Unknown error"}
           </ErrorMessage>
-          <ResetButton onClick={() => this.setState({ hasError: false, error: null })}>
+          <ResetButton
+            onClick={() => this.setState({ hasError: false, error: null })}
+          >
             Try Again
           </ResetButton>
         </ErrorContainer>

@@ -1,8 +1,8 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Upload, Info, Settings, HelpCircle } from 'react-feather';
-import IconButton from '../UI/IconButton';
-import { APP } from '../../config/constants';
+import React from "react";
+import styled from "styled-components";
+import { Upload, Info, Settings } from "react-feather";
+import IconButton from "../UI/IconButton";
+import { APP } from "../../config/constants";
 
 const HeaderContainer = styled.header`
   height: ${({ theme }) => theme.sizes.headerHeight};
@@ -41,44 +41,31 @@ const ActionsContainer = styled.div`
 
 interface AppHeaderProps {
   onUploadClick?: () => void;
+  onSettingsClick?: () => void;
+  onInfoClick?: () => void;
 }
 
-const AppHeader: React.FC<AppHeaderProps> = ({ onUploadClick }) => {
+const AppHeader: React.FC<AppHeaderProps> = ({
+  onUploadClick,
+  onSettingsClick,
+  onInfoClick,
+}) => {
   return (
     <HeaderContainer>
       <LogoContainer>
         <Logo>{APP.NAME}</Logo>
         <Version>v{APP.VERSION}</Version>
       </LogoContainer>
-      
+
       <ActionsContainer>
-        <IconButton 
-          title="Upload PDF" 
-          onClick={onUploadClick}
-          $variant="text"
-        >
+        <IconButton title="Upload PDF" onClick={onUploadClick} $variant="text">
           <Upload size={20} />
         </IconButton>
-        
-        <IconButton 
-          title="Information" 
-          $variant="text"
-        >
-          <Info size={20} />
-        </IconButton>
-        
-        <IconButton 
-          title="Settings" 
-          $variant="text"
-        >
+        <IconButton title="Settings" $variant="text" onClick={onSettingsClick}>
           <Settings size={20} />
         </IconButton>
-        
-        <IconButton 
-          title="Help" 
-          $variant="text"
-        >
-          <HelpCircle size={20} />
+        <IconButton title="Information" $variant="text" onClick={onInfoClick}>
+          <Info size={20} />
         </IconButton>
       </ActionsContainer>
     </HeaderContainer>

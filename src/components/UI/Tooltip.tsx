@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useState } from "react";
+import styled, { keyframes } from "styled-components";
 
 interface TooltipProps {
   content: React.ReactNode;
-  position?: 'top' | 'right' | 'bottom' | 'left';
+  position?: "top" | "right" | "bottom" | "left";
   delay?: number;
   maxWidth?: string;
   children: React.ReactElement;
@@ -24,7 +24,7 @@ const TooltipWrapper = styled.div`
 `;
 
 const TooltipContent = styled.div<{
-  $position: 'top' | 'right' | 'bottom' | 'left';
+  $position: "top" | "right" | "bottom" | "left";
   $visible: boolean;
   $maxWidth: string;
 }>`
@@ -40,32 +40,32 @@ const TooltipContent = styled.div<{
   pointer-events: none;
   white-space: nowrap;
   animation: ${fadeIn} 0.2s ease-in-out;
-  display: ${({ $visible }) => ($visible ? 'block' : 'none')};
-  
+  display: ${({ $visible }) => ($visible ? "block" : "none")};
+
   ${({ $position }) => {
     switch ($position) {
-      case 'right':
+      case "right":
         return `
           left: 100%;
           top: 50%;
           transform: translateY(-50%);
           margin-left: 8px;
         `;
-      case 'bottom':
+      case "bottom":
         return `
           top: 100%;
           left: 50%;
           transform: translateX(-50%);
           margin-top: 8px;
         `;
-      case 'left':
+      case "left":
         return `
           right: 100%;
           top: 50%;
           transform: translateY(-50%);
           margin-right: 8px;
         `;
-      case 'top':
+      case "top":
       default:
         return `
           bottom: 100%;
@@ -75,46 +75,46 @@ const TooltipContent = styled.div<{
         `;
     }
   }}
-  
+
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     border-style: solid;
-    
+
     ${({ $position }) => {
       switch ($position) {
-        case 'right':
+        case "right":
           return `
             left: -4px;
             top: 50%;
             transform: translateY(-50%);
             border-width: 5px 5px 5px 0;
-            border-color: transparent ${({ theme }) => theme.colors.background.secondary} transparent transparent;
+            border-color: transparent ${(props: any) => props.theme.colors.background.secondary} transparent transparent;
           `;
-        case 'bottom':
+        case "bottom":
           return `
             top: -4px;
             left: 50%;
             transform: translateX(-50%);
             border-width: 0 5px 5px 5px;
-            border-color: transparent transparent ${({ theme }) => theme.colors.background.secondary} transparent;
+            border-color: transparent transparent ${(props: any) => props.theme.colors.background.secondary} transparent;
           `;
-        case 'left':
+        case "left":
           return `
             right: -4px;
             top: 50%;
             transform: translateY(-50%);
             border-width: 5px 0 5px 5px;
-            border-color: transparent transparent transparent ${({ theme }) => theme.colors.background.secondary};
+            border-color: transparent transparent transparent ${(props: any) => props.theme.colors.background.secondary};
           `;
-        case 'top':
+        case "top":
         default:
           return `
             bottom: -4px;
             left: 50%;
             transform: translateX(-50%);
             border-width: 5px 5px 0 5px;
-            border-color: ${({ theme }) => theme.colors.background.secondary} transparent transparent transparent;
+            border-color: ${(props: any) => props.theme.colors.background.secondary} transparent transparent transparent;
           `;
       }
     }}
@@ -123,10 +123,10 @@ const TooltipContent = styled.div<{
 
 const Tooltip: React.FC<TooltipProps> = ({
   content,
-  position = 'top',
+  position = "top",
   delay = 300,
-  maxWidth = '200px',
-  children
+  maxWidth = "200px",
+  children,
 }) => {
   const [visible, setVisible] = useState(false);
   const [timeoutId, setTimeoutId] = useState<number | null>(null);
@@ -152,9 +152,9 @@ const Tooltip: React.FC<TooltipProps> = ({
       onMouseLeave={handleMouseLeave}
     >
       {children}
-      <TooltipContent 
-        $position={position} 
-        $visible={visible} 
+      <TooltipContent
+        $position={position}
+        $visible={visible}
         $maxWidth={maxWidth}
       >
         {content}
